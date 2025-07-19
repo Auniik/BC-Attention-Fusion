@@ -1,0 +1,367 @@
+❯ python main.py
+Dataset Statistics:
+--------------------------------------------------------------------------------
+Category                                 Images     Patients
+--------------------------------------------------------------------------------
+benign_adenosis_100X                     113        4
+benign_adenosis_200X                     111        4
+benign_adenosis_400X                     106        4
+benign_adenosis_40X                      114        4
+benign_fibroadenoma_100X                 260        10
+benign_fibroadenoma_200X                 264        10
+benign_fibroadenoma_400X                 237        10
+benign_fibroadenoma_40X                  253        10
+benign_phyllodes_tumor_100X              121        3
+benign_phyllodes_tumor_200X              108        3
+benign_phyllodes_tumor_400X              115        3
+benign_phyllodes_tumor_40X               109        3
+benign_tubular_adenoma_100X              150        7
+benign_tubular_adenoma_200X              140        7
+benign_tubular_adenoma_400X              130        7
+benign_tubular_adenoma_40X               149        7
+malignant_ductal_carcinoma_100X          903        38
+malignant_ductal_carcinoma_200X          896        38
+malignant_ductal_carcinoma_400X          788        38
+malignant_ductal_carcinoma_40X           864        38
+malignant_lobular_carcinoma_100X         170        5
+malignant_lobular_carcinoma_200X         163        5
+malignant_lobular_carcinoma_400X         137        5
+malignant_lobular_carcinoma_40X          156        5
+malignant_mucinous_carcinoma_100X        222        9
+malignant_mucinous_carcinoma_200X        196        9
+malignant_mucinous_carcinoma_400X        169        9
+malignant_mucinous_carcinoma_40X         205        9
+malignant_papillary_carcinoma_100X       142        6
+malignant_papillary_carcinoma_200X       135        6
+malignant_papillary_carcinoma_400X       138        6
+malignant_papillary_carcinoma_40X        145        6
+
+Folds.csv Info:
+Shape: (39545, 4)
+
+Columns: ['fold', 'mag', 'grp', 'filename']
+
+First few rows:
+   fold  mag    grp                                           filename
+0     1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
+1     1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
+2     1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
+3     1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
+4     1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
+
+Fold distribution:
+fold
+1    7909
+2    7909
+3    7909
+4    7909
+5    7909
+Name: count, dtype: int64
+
+Magnification distribution:
+mag
+100    10405
+200    10065
+40      9975
+400     9100
+Name: count, dtype: int64
+
+Train/Test distribution:
+grp
+train    25880
+test     13665
+Name: count, dtype: int64
+       fold  mag    grp                                           filename
+0         1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
+1         1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
+2         1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
+3         1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
+4         1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
+...     ...  ...    ...                                                ...
+39540     5  400   test  BreaKHis_v1/histology_slides/breast/malignant/...
+39541     5  400   test  BreaKHis_v1/histology_slides/breast/malignant/...
+39542     5  400   test  BreaKHis_v1/histology_slides/breast/malignant/...
+39543     5  400   test  BreaKHis_v1/histology_slides/breast/malignant/...
+39544     5  400   test  BreaKHis_v1/histology_slides/breast/malignant/...
+
+[39545 rows x 4 columns]
+Dataset structure analysis:
+Unique patients: 82
+
+Tumor types distribution:
+tumor_class  tumor_type
+benign       adenosis                2220
+             fibroadenoma            5070
+             phyllodes_tumor         2265
+             tubular_adenoma         2845
+malignant    ductal_carcinoma       17255
+             lobular_carcinoma       3130
+             mucinous_carcinoma      3960
+             papillary_carcinoma     2800
+dtype: int64
+
+Patients by number of magnifications available:
+magnification
+4    82
+Name: count, dtype: int64
+
+Images per patient-magnification (sample):
+patient_id          magnification
+SOB_B_A_14-22549AB  40               145
+                    100              150
+                    200              160
+                    400              150
+SOB_B_A_14-22549CD  40               175
+                    100              180
+                    200              155
+                    400              150
+SOB_B_A_14-22549G   40               175
+                    100              170
+                    200              160
+                    400              145
+SOB_B_A_14-29960CD  40                75
+                    100               65
+                    200               80
+                    400               85
+SOB_B_F_14-14134    40               180
+                    100              155
+                    200              190
+                    400              185
+dtype: int64
+
+============================================================
+FOLD 1 ANALYSIS
+============================================================
+=== CLASS DISTRIBUTION ANALYSIS ===
+
+Class distribution by split:
+tumor_class  benign  malignant
+grp
+test           1008       1896
+train          1472       3533
+
+Class ratio (benign:malignant) in train: 1472:3533
+
+=== TUMOR TYPE DISTRIBUTION ===
+tumor_class  tumor_type
+benign       adenosis                253
+             fibroadenoma            683
+             phyllodes_tumor         218
+             tubular_adenoma         318
+malignant    ductal_carcinoma       2313
+             lobular_carcinoma       302
+             mucinous_carcinoma      547
+             papillary_carcinoma     371
+dtype: int64
+
+=== PATIENT-LEVEL ANALYSIS ===
+Unique patients - Benign: 24, Malignant: 58
+
+Images per patient stats:
+Mean: 92.7, Std: 34.9
+
+=== MAGNIFICATION BALANCE ===
+mag          40   100  200  400
+tumor_class
+benign       370  383  368  351
+malignant    880  938  901  814
+
+=== CALCULATED WEIGHTS ===
+Class weights: {'malignant': 0.7083215397679027, 'benign': 1.7000679347826086}
+
+Tumor type weights (top 5):
+  phyllodes_tumor: 2.870
+  adenosis: 2.473
+  lobular_carcinoma: 2.072
+  tubular_adenoma: 1.967
+  papillary_carcinoma: 1.686
+==== Fold 1 ====
+Balanced dataset: 312 benign, 312 malignant
+Dataset initialized:
+  Mode: train
+  Patients: 82
+  Samples per epoch: 624
+  Magnifications: [40, 100, 200, 400]
+Dataset initialized:
+  Mode: test
+  Patients: 82
+  Samples per epoch: 56
+  Magnifications: [40, 100, 200, 400]
+Starting training...
+
+Epoch 1/10
+--------------------------------------------------
+Training: 100%|--| 78/78 [00:39<00:00,  1.97it/s, loss=0.4921]
+Validating:   0%|                                                                                                                                                    | 0/7 [00:00<?, ?it/s]Balanced Acc: 0.4375 (B: 0.8750, M: 0.0000)
+Validating:  14%|--                                                                                                                        | 1/7 [00:05<00:32,  5.44s/it]Balanced Acc: 0.4062 (B: 0.8125, M: 0.0000)
+Balanced Acc: 0.7500 (B: 0.8333, M: 0.6667)
+Validating:  43%|------                                                                                | 3/7 [00:05<00:05,  1.46s/it]Balanced Acc: 0.8452 (B: 0.8333, M: 0.8571)
+Balanced Acc: 0.8258 (B: 0.8333, M: 0.8182)
+Validating:  71%|----------                                        | 5/7 [00:05<00:01,  1.28it/s]Balanced Acc: 0.8500 (B: 0.8333, M: 0.8667)
+Balanced Acc: 0.8246 (B: 0.8333, M: 0.8158)
+Validating: 100%|----| 7/7 [00:16<00:00,  2.29s/it]
+Train - Loss: 0.7370, Acc: 0.7147, F1: 0.7147
+Val - Loss: 0.8199, Acc: 0.8214, F1: 0.8254, Tumor Acc: 0.4643
+Saved best model of Fold-1 with validation accuracy: 0.8246
+
+Epoch 2/10
+--------------------------------------------------
+Training: 100%|--| 78/78 [00:27<00:00,  2.89it/s, loss=0.4995]
+Validating:   0%|                                                                                                                                                    | 0/7 [00:00<?, ?it/s]Balanced Acc: 0.4375 (B: 0.8750, M: 0.0000)
+Validating:  14%|--                                                                                                                        | 1/7 [00:05<00:30,  5.13s/it]Balanced Acc: 0.4375 (B: 0.8750, M: 0.0000)
+Balanced Acc: 0.6111 (B: 0.8889, M: 0.3333)
+Validating:  43%|------                                                                                | 3/7 [00:05<00:05,  1.42s/it]Balanced Acc: 0.8016 (B: 0.8889, M: 0.7143)
+Balanced Acc: 0.7172 (B: 0.8889, M: 0.5455)
+Validating:  71%|----------                                        | 5/7 [00:05<00:01,  1.32it/s]Balanced Acc: 0.7444 (B: 0.8889, M: 0.6000)
+Balanced Acc: 0.7076 (B: 0.8889, M: 0.5263)
+Validating: 100%|----| 7/7 [00:15<00:00,  2.27s/it]
+Train - Loss: 0.6385, Acc: 0.7660, F1: 0.7660
+Val - Loss: 0.9841, Acc: 0.6429, F1: 0.6502, Tumor Acc: 0.1429
+
+Epoch 3/10
+--------------------------------------------------
+Training: 100%|--| 78/78 [00:27<00:00,  2.84it/s, loss=0.4275]
+Validating:   0%|                                                                                                                                                    | 0/7 [00:00<?, ?it/s]Balanced Acc: 0.5000 (B: 1.0000, M: 0.0000)
+Validating:  14%|--                                                                                                                        | 1/7 [00:05<00:31,  5.17s/it]Balanced Acc: 0.4688 (B: 0.9375, M: 0.0000)
+Balanced Acc: 0.7222 (B: 0.9444, M: 0.5000)
+Validating:  43%|------                                                                                | 3/7 [00:05<00:05,  1.42s/it]Balanced Acc: 0.8651 (B: 0.9444, M: 0.7857)
+Balanced Acc: 0.8586 (B: 0.9444, M: 0.7727)
+Validating:  71%|----------                                        | 5/7 [00:05<00:01,  1.32it/s]Balanced Acc: 0.8722 (B: 0.9444, M: 0.8000)
+Balanced Acc: 0.8143 (B: 0.9444, M: 0.6842)
+Validating: 100%|----| 7/7 [00:15<00:00,  2.26s/it]
+Train - Loss: 0.6205, Acc: 0.7740, F1: 0.7740
+Val - Loss: 0.8443, Acc: 0.7679, F1: 0.7754, Tumor Acc: 0.4643
+
+Epoch 4/10
+--------------------------------------------------
+Training: 100%|--| 78/78 [00:26<00:00,  2.90it/s, loss=0.5261]
+Validating:   0%|                                                                                                                                                    | 0/7 [00:00<?, ?it/s]Balanced Acc: 0.5000 (B: 1.0000, M: 0.0000)
+Validating:  14%|--                                                                                                                        | 1/7 [00:05<00:30,  5.08s/it]Balanced Acc: 0.4062 (B: 0.8125, M: 0.0000)
+Balanced Acc: 0.9167 (B: 0.8333, M: 1.0000)
+Validating:  43%|------                                                                                | 3/7 [00:05<00:05,  1.39s/it]Balanced Acc: 0.9167 (B: 0.8333, M: 1.0000)
+Balanced Acc: 0.8712 (B: 0.8333, M: 0.9091)
+Validating:  71%|----------                                        | 5/7 [00:05<00:01,  1.35it/s]Balanced Acc: 0.8667 (B: 0.8333, M: 0.9000)
+Balanced Acc: 0.8509 (B: 0.8333, M: 0.8684)
+Validating: 100%|----| 7/7 [00:15<00:00,  2.25s/it]
+Train - Loss: 0.5932, Acc: 0.7949, F1: 0.7945
+Val - Loss: 0.8002, Acc: 0.8571, F1: 0.8590, Tumor Acc: 0.4821
+Saved best model of Fold-1 with validation accuracy: 0.8509
+
+Epoch 5/10
+--------------------------------------------------
+Training: 100%|--| 78/78 [00:29<00:00,  2.60it/s, loss=0.4064]
+Validating:   0%|                                                                                                                                                    | 0/7 [00:00<?, ?it/s]Balanced Acc: 0.5000 (B: 1.0000, M: 0.0000)
+Validating:  14%|--                                                                                                                        | 1/7 [00:04<00:29,  4.99s/it]Balanced Acc: 0.4688 (B: 0.9375, M: 0.0000)
+Balanced Acc: 0.8056 (B: 0.9444, M: 0.6667)
+Validating:  43%|------                                                                                | 3/7 [00:05<00:05,  1.38s/it]Balanced Acc: 0.9008 (B: 0.9444, M: 0.8571)
+Balanced Acc: 0.8813 (B: 0.9444, M: 0.8182)
+Validating:  71%|----------                                        | 5/7 [00:05<00:01,  1.36it/s]Balanced Acc: 0.8889 (B: 0.9444, M: 0.8333)
+Balanced Acc: 0.8538 (B: 0.9444, M: 0.7632)
+Validating: 100%|----| 7/7 [00:15<00:00,  2.24s/it]
+Train - Loss: 0.5736, Acc: 0.7933, F1: 0.7932
+Val - Loss: 0.7311, Acc: 0.8214, F1: 0.8272, Tumor Acc: 0.4286
+Saved best model of Fold-1 with validation accuracy: 0.8538
+
+Epoch 6/10
+--------------------------------------------------
+Training: 100%|--| 78/78 [00:26<00:00,  2.92it/s, loss=0.4054]
+Validating:   0%|                                                                                                                                                    | 0/7 [00:00<?, ?it/s]Balanced Acc: 0.5000 (B: 1.0000, M: 0.0000)
+Validating:  14%|--                                                                                                                        | 1/7 [00:05<00:30,  5.07s/it]Balanced Acc: 0.3750 (B: 0.7500, M: 0.0000)
+Balanced Acc: 0.8056 (B: 0.7778, M: 0.8333)
+Validating:  43%|------                                                                                | 3/7 [00:05<00:05,  1.40s/it]Balanced Acc: 0.8532 (B: 0.7778, M: 0.9286)
+Balanced Acc: 0.7980 (B: 0.7778, M: 0.8182)
+Validating:  71%|----------                                        | 5/7 [00:05<00:01,  1.33it/s]Balanced Acc: 0.8056 (B: 0.7778, M: 0.8333)
+Balanced Acc: 0.7968 (B: 0.7778, M: 0.8158)
+Validating: 100%|----| 7/7 [00:15<00:00,  2.26s/it]
+Train - Loss: 0.5492, Acc: 0.8189, F1: 0.8188
+Val - Loss: 0.9014, Acc: 0.8036, F1: 0.8071, Tumor Acc: 0.4107
+
+Epoch 7/10
+--------------------------------------------------
+Training: 100%|--| 78/78 [00:28<00:00,  2.70it/s, loss=0.4264]
+Validating:   0%|                                                                                                                                                    | 0/7 [00:00<?, ?it/s]Balanced Acc: 0.5000 (B: 1.0000, M: 0.0000)
+Validating:  14%|--                                                                                                                        | 1/7 [00:05<00:31,  5.18s/it]Balanced Acc: 0.3750 (B: 0.7500, M: 0.0000)
+Balanced Acc: 0.8056 (B: 0.7778, M: 0.8333)
+Validating:  43%|------                                                                                | 3/7 [00:05<00:05,  1.43s/it]Balanced Acc: 0.8532 (B: 0.7778, M: 0.9286)
+Balanced Acc: 0.8434 (B: 0.7778, M: 0.9091)
+Validating:  71%|----------                                        | 5/7 [00:05<00:01,  1.31it/s]Balanced Acc: 0.8556 (B: 0.7778, M: 0.9333)
+Balanced Acc: 0.8231 (B: 0.7778, M: 0.8684)
+Validating: 100%|----| 7/7 [00:15<00:00,  2.27s/it]
+Train - Loss: 0.5266, Acc: 0.8494, F1: 0.8493
+Val - Loss: 0.7395, Acc: 0.8393, F1: 0.8404, Tumor Acc: 0.3571
+
+Epoch 8/10
+--------------------------------------------------
+Training: 100%|--| 78/78 [00:26<00:00,  2.93it/s, loss=0.3975]
+Validating:   0%|                                                                                                                                                    | 0/7 [00:00<?, ?it/s]Balanced Acc: 0.5000 (B: 1.0000, M: 0.0000)
+Validating:  14%|--                                                                                                                        | 1/7 [00:05<00:31,  5.24s/it]Balanced Acc: 0.3750 (B: 0.7500, M: 0.0000)
+Balanced Acc: 0.8056 (B: 0.7778, M: 0.8333)
+Validating:  43%|------                                                                                | 3/7 [00:05<00:05,  1.41s/it]Balanced Acc: 0.8532 (B: 0.7778, M: 0.9286)
+Balanced Acc: 0.8434 (B: 0.7778, M: 0.9091)
+Validating:  71%|----------                                        | 5/7 [00:05<00:01,  1.31it/s]Balanced Acc: 0.8556 (B: 0.7778, M: 0.9333)
+Balanced Acc: 0.8231 (B: 0.7778, M: 0.8684)
+Validating: 100%|----| 7/7 [00:15<00:00,  2.27s/it]
+Train - Loss: 0.5282, Acc: 0.8269, F1: 0.8269
+Val - Loss: 0.6942, Acc: 0.8393, F1: 0.8404, Tumor Acc: 0.4107
+
+Epoch 9/10
+--------------------------------------------------
+Training: 100%|--| 78/78 [00:27<00:00,  2.86it/s, loss=0.3945]
+Validating:   0%|                                                                                                                                                    | 0/7 [00:00<?, ?it/s]Balanced Acc: 0.5000 (B: 1.0000, M: 0.0000)
+Validating:  14%|--                                                                                                                        | 1/7 [00:04<00:29,  4.97s/it]Balanced Acc: 0.4062 (B: 0.8125, M: 0.0000)
+Balanced Acc: 0.8333 (B: 0.8333, M: 0.8333)
+Validating:  43%|------                                                                                | 3/7 [00:05<00:05,  1.38s/it]Balanced Acc: 0.8810 (B: 0.8333, M: 0.9286)
+Balanced Acc: 0.8485 (B: 0.8333, M: 0.8636)
+Validating:  71%|----------                                        | 5/7 [00:05<00:01,  1.36it/s]Balanced Acc: 0.8500 (B: 0.8333, M: 0.8667)
+Balanced Acc: 0.8246 (B: 0.8333, M: 0.8158)
+Validating: 100%|----| 7/7 [00:15<00:00,  2.24s/it]
+Train - Loss: 0.4996, Acc: 0.8542, F1: 0.8542
+Val - Loss: 0.7713, Acc: 0.8214, F1: 0.8254, Tumor Acc: 0.3929
+
+Epoch 10/10
+--------------------------------------------------
+Training: 100%|--| 78/78 [00:26<00:00,  2.91it/s, loss=0.3706]
+Validating:   0%|                                                                                                                                                    | 0/7 [00:00<?, ?it/s]Balanced Acc: 0.5000 (B: 1.0000, M: 0.0000)
+Validating:  14%|--                                                                                                                        | 1/7 [00:05<00:30,  5.03s/it]Balanced Acc: 0.4375 (B: 0.8750, M: 0.0000)
+Balanced Acc: 0.9444 (B: 0.8889, M: 1.0000)
+Validating:  43%|------                                                                                | 3/7 [00:05<00:05,  1.39s/it]Balanced Acc: 0.9444 (B: 0.8889, M: 1.0000)
+Balanced Acc: 0.8990 (B: 0.8889, M: 0.9091)
+Validating:  71%|----------                                        | 5/7 [00:05<00:01,  1.34it/s]Balanced Acc: 0.8944 (B: 0.8889, M: 0.9000)
+Balanced Acc: 0.8655 (B: 0.8889, M: 0.8421)
+Validating: 100%|----| 7/7 [00:15<00:00,  2.25s/it]
+Train - Loss: 0.4689, Acc: 0.8782, F1: 0.8781
+Val - Loss: 0.7685, Acc: 0.8571, F1: 0.8603, Tumor Acc: 0.4107
+Saved best model of Fold-1 with validation accuracy: 0.8655
+[[16  2]
+ [ 6 32]]
+
+=== DETAILED CLASSIFICATION REPORT ===
+              precision    recall  f1-score   support
+
+      benign     0.7273    0.8889    0.8000        18
+   malignant     0.9412    0.8421    0.8889        38
+
+    accuracy                         0.8571        56
+   macro avg     0.8342    0.8655    0.8444        56
+weighted avg     0.8724    0.8571    0.8603        56
+
+
+=== CONFUSION MATRIX ===
+Predicted:  benign  malignant
+benign:         16        2
+malignant:       6       32
+
+=== KEY INSIGHTS ===
+Benign Recall: 0.8889 (16/18)
+Malignant Recall: 0.8421 (32/38)
+
+Prediction distribution: benign=22, malignant=34
+Analyzing cross-magnification feature importance...
+
+Final Validation Accuracy: 0.8571
+
+Magnification Importance Analysis:
+40x contribution: 0.0142 ± 0.0300
+100x contribution: -0.0351 ± 0.0637
+200x contribution: -0.0401 ± 0.1001
+400x contribution: 0.0661 ± 0.0562
