@@ -264,9 +264,9 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
             
             # Save best model - handle DataParallel wrapper
             if hasattr(model, 'module'):
-                torch.save(model.module.state_dict(), f'output/best_model_fold_{fold}.pth', weights_only=True)
+                torch.save(model.module.state_dict(), f'output/best_model_fold_{fold}.pth')
             else:
-                torch.save(model.state_dict(), f'output/best_model_fold_{fold}.pth', weights_only=True)
+                torch.save(model.state_dict(), f'output/best_model_fold_{fold}.pth')
             print(f"🎯 New best accuracy: {best_val_acc:.4f} (Bal: {best_balanced_acc:.4f}) - Model saved!")
             print(f"   Per-class performance: B={benign_acc:.4f}, M={malignant_acc:.4f} ✅")
         else:
