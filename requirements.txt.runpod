@@ -6,8 +6,8 @@ torch>=2.0.0
 torchvision>=0.15.0
 timm>=0.9.0
 
-# Scientific computing
-numpy
+# Scientific computing - numpy version compatible with PyTorch
+numpy>=1.21.0,<2.0.0
 scipy>=1.7.0
 scikit-learn>=1.0.0
 pandas
