@@ -1,4 +1,3 @@
-# 1. FIRST - Analyze what's really happening
 import numpy as np
 
 

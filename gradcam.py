@@ -9,7 +9,7 @@ class GradCAM:
     def __init__(self, model):
         self.model = model
         self.activations = {}
-        os.makedirs('gradcam_outputs', exist_ok=True)
+        os.makedirs('figs/gradcam_outputs', exist_ok=True)
 
     def get_cam(self, images_dict, target_class=None, use_tumor_head=False):
         self.model.eval()
@@ -18,7 +18,7 @@ class GradCAM:
         # Register hooks for scale3
         handles = []
         for mag in ['40', '100', '200', '400']:
-            layer = getattr(self.model.extractors[f'extractor_{mag}x'], 'scale3')
+            layer = getattr(self.model.extractors[f'extractor_{mag}x'], 'conv_head')
 
             def forward_hook(module, input, output, name=mag):
                 self.activations[name] = output
@@ -110,3 +110,25 @@ def visualize_gradcam(cam_dict, images_dict, true_label=None, pred_label=None, s
         # plt.show()
     else:
         plt.close()
+
+
+def plot_and_save_gradcam(model, val_loader, device, fold):
+    model.eval()
+    gradcam = GradCAM(model)
+    for i, batch in enumerate(val_loader):
+        if i >= 3: break
+        sample_images = {k: v[0:1].to(device) for k, v in batch['images'].items()}
+        true_label = batch['class_label'][0].item()
+        with torch.no_grad():
+            logits, _ = model(sample_images)
+            pred_label = logits.argmax(dim=1).item()
+    
+        cams = gradcam.get_cam(sample_images, target_class=pred_label)
+        visualize_gradcam(
+            cams,
+            sample_images,
+            true_label=true_label,
+            pred_label=pred_label,
+            save_path=f'figs/gradcam_outputs/fold_{fold}_sample_{i}.png',
+            show=True
+        )

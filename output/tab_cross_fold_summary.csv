@@ -1,0 +1,6 @@
+,fold_no,multi_mag_patients_count,single_mag_patients_count,train_samples,test_samples
+0,1,82,0,5005,2904
+1,2,82,0,5506,2403
+2,3,82,0,5332,2577
+3,4,82,0,5211,2698
+4,5,82,0,4826,3083

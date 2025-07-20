@@ -104,7 +104,7 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
             # loss = 0.7 * loss_class + 0.3 * loss_tumor
             # loss = 0.35 * loss_class + 0.65 * loss_tumor
             # loss = 0.6 * loss_class + 0.4 * loss_tumor
-            loss = 0.8 * loss_class + 0.2 * loss_tumor 
+            loss = 0.9 * loss_class + 0.1 * loss_tumor 
 
             # Backward pass
             loss.backward()
@@ -188,7 +188,7 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
         # Save best model
         if balanced_acc > best_val_acc: 
             best_val_acc = balanced_acc
-            torch.save(model.state_dict(), f'best_model_fold_{fold}.pth')
+            torch.save(model.state_dict(), f'output/best_model_fold_{fold}.pth')
             print(f"Saved best model of Fold-{fold} with validation accuracy: {best_val_acc:.4f}")
     
     return history, all_preds, all_labels

@@ -1,12 +1,11 @@
 import torch
-from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms
+from torch.utils.data import Dataset
 from PIL import Image
-import random
 import os
 import numpy as np
 
-BASE_PATH = './data/breakhis'
+from config import BASE_PATH
+
 
 class MultiMagnificationDataset(Dataset):    
     def __init__(self, patient_data, fold_df, mode='train', mags=[40, 100, 200, 400], 
