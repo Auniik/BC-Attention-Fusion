@@ -11,7 +11,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-def get_loss_weights(fold_df, device='cuda'):
+def get_loss_weights(fold_df, device):
     train_df = fold_df[fold_df['grp'] == 'train']
     
     # Binary classification weights
@@ -87,9 +87,9 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
         progress_bar = tqdm(train_loader, desc='Training')
         
         for batch in progress_bar:
-            images_dict = {k: v.to(device) for k, v in batch['images'].items()}
-            class_labels = batch['class_label'].to(device)
-            tumor_labels = batch['tumor_type_label'].to(device)
+            images_dict = {k: v.to(device, non_blocking=True) for k, v in batch['images'].items()}
+            class_labels = batch['class_label'].to(device, non_blocking=True)
+            tumor_labels = batch['tumor_type_label'].to(device, non_blocking=True)
             
             optimizer.zero_grad()
             
@@ -101,27 +101,28 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
             loss_tumor = criterion_tumor(tumor_logits, tumor_labels)
             
             # Combined loss
-            # loss = 0.7 * loss_class + 0.3 * loss_tumor
-            # loss = 0.35 * loss_class + 0.65 * loss_tumor
-            # loss = 0.6 * loss_class + 0.4 * loss_tumor
             loss = 0.9 * loss_class + 0.1 * loss_tumor 
 
             # Backward pass
             loss.backward()
             optimizer.step()
             
-            # Statistics
+            # Statistics - accumulate on GPU to reduce transfers
             running_loss += loss.item()
             preds = torch.argmax(class_logits, dim=1)
-            all_preds.extend(preds.cpu().numpy())
-            all_labels.extend(class_labels.cpu().numpy())
+            all_preds.append(preds)
+            all_labels.append(class_labels)
             
             # Update progress bar
             progress_bar.set_postfix({'loss': f'{loss.item():.4f}'})
         
+        # Convert accumulated tensors to numpy once at the end
+        all_preds_np = torch.cat(all_preds).cpu().numpy()
+        all_labels_np = torch.cat(all_labels).cpu().numpy()
+        
         train_loss = running_loss / len(train_loader)
-        train_acc = accuracy_score(all_labels, all_preds)
-        train_f1 = f1_score(all_labels, all_preds, average='weighted')
+        train_acc = accuracy_score(all_labels_np, all_preds_np)
+        train_f1 = f1_score(all_labels_np, all_preds_np, average='weighted')
         
         # Validation
         model.eval()
@@ -133,9 +134,9 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
         
         with torch.no_grad():
             for batch in tqdm(val_loader, desc='Validating'):
-                images_dict = {k: v.to(device) for k, v in batch['images'].items()}
-                class_labels = batch['class_label'].to(device)
-                tumor_labels = batch['tumor_type_label'].to(device)
+                images_dict = {k: v.to(device, non_blocking=True) for k, v in batch['images'].items()}
+                class_labels = batch['class_label'].to(device, non_blocking=True)
+                tumor_labels = batch['tumor_type_label'].to(device, non_blocking=True)
                 
                 # Forward pass
                 class_logits, tumor_logits = model(images_dict)
@@ -145,29 +146,33 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
                 loss_tumor = criterion_tumor(tumor_logits, tumor_labels)
                 loss = 0.7 * loss_class + 0.3 * loss_tumor
                 
-                # Statistics
+                # Statistics - accumulate on GPU
                 running_loss += loss.item()
                 preds = torch.argmax(class_logits, dim=1)
                 tumor_preds = torch.argmax(tumor_logits, dim=1)
                 
-                all_preds.extend(preds.cpu().numpy())
-                all_labels.extend(class_labels.cpu().numpy())
-                
-                benign_mask = np.array(all_labels) == 0
-                malignant_mask = np.array(all_labels) == 1
-                benign_acc = accuracy_score(np.array(all_labels)[benign_mask], np.array(all_preds)[benign_mask]) if benign_mask.any() else 0
-                malignant_acc = accuracy_score(np.array(all_labels)[malignant_mask], np.array(all_preds)[malignant_mask]) if malignant_mask.any() else 0
-                balanced_acc = (benign_acc + malignant_acc) / 2
-                print(f"Balanced Acc: {balanced_acc:.4f} (B: {benign_acc:.4f}, M: {malignant_acc:.4f})")
-
-                
-                all_tumor_preds.extend(tumor_preds.cpu().numpy())
-                all_tumor_labels.extend(tumor_labels.cpu().numpy())
+                all_preds.append(preds)
+                all_labels.append(class_labels)
+                all_tumor_preds.append(tumor_preds)
+                all_tumor_labels.append(tumor_labels)
+        
+        # Convert accumulated tensors to numpy once at the end
+        all_preds_np = torch.cat(all_preds).cpu().numpy()
+        all_labels_np = torch.cat(all_labels).cpu().numpy()
+        all_tumor_preds_np = torch.cat(all_tumor_preds).cpu().numpy()
+        all_tumor_labels_np = torch.cat(all_tumor_labels).cpu().numpy()
+        
+        # Calculate balanced accuracy
+        benign_mask = all_labels_np == 0
+        malignant_mask = all_labels_np == 1
+        benign_acc = accuracy_score(all_labels_np[benign_mask], all_preds_np[benign_mask]) if benign_mask.any() else 0
+        malignant_acc = accuracy_score(all_labels_np[malignant_mask], all_preds_np[malignant_mask]) if malignant_mask.any() else 0
+        balanced_acc = (benign_acc + malignant_acc) / 2
         
         val_loss = running_loss / len(val_loader)
-        val_acc = accuracy_score(all_labels, all_preds)
-        val_f1 = f1_score(all_labels, all_preds, average='weighted')
-        tumor_acc = accuracy_score(all_tumor_labels, all_tumor_preds)
+        val_acc = accuracy_score(all_labels_np, all_preds_np)
+        val_f1 = f1_score(all_labels_np, all_preds_np, average='weighted')
+        tumor_acc = accuracy_score(all_tumor_labels_np, all_tumor_preds_np)
         
         # Update learning rate
         scheduler.step()
@@ -184,6 +189,7 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
         # Print results
         print(f"Train - Loss: {train_loss:.4f}, Acc: {train_acc:.4f}, F1: {train_f1:.4f}")
         print(f"Val - Loss: {val_loss:.4f}, Acc: {val_acc:.4f}, F1: {val_f1:.4f}, Tumor Acc: {tumor_acc:.4f}")
+        print(f"Balanced Acc: {balanced_acc:.4f} (B: {benign_acc:.4f}, M: {malignant_acc:.4f})")
         
         # Save best model
         if balanced_acc > best_val_acc: 
@@ -191,4 +197,4 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
             torch.save(model.state_dict(), f'output/best_model_fold_{fold}.pth')
             print(f"Saved best model of Fold-{fold} with validation accuracy: {best_val_acc:.4f}")
     
-    return history, all_preds, all_labels
+    return history, all_preds_np, all_labels_np

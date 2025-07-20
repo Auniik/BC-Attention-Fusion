@@ -103,10 +103,10 @@ def main():
             transform=val_transform
         )
 
-        train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=0,
-                                worker_init_fn=seed_worker, generator=g)
-        val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False, num_workers=0,
-                                worker_init_fn=seed_worker, generator=g)
+        train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=4,
+                                worker_init_fn=seed_worker, generator=g, pin_memory=True)
+        val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False, num_workers=4,
+                                worker_init_fn=seed_worker, generator=g, pin_memory=True)
 
         print("Starting training...")
         history, val_preds, val_labels = train_model(

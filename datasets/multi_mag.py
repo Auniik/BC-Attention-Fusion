@@ -113,7 +113,7 @@ class MultiMagnificationDataset(Dataset):
 
         return {
             'images': images,
-            'class_label': torch.tensor(class_label),
-            'tumor_type_label': torch.tensor(tumor_type_label),
+            'class_label': torch.tensor(class_label, dtype=torch.long),
+            'tumor_type_label': torch.tensor(tumor_type_label, dtype=torch.long),
             'patient_id': sample['patient_id']
         }
