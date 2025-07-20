@@ -110,8 +110,8 @@ def main():
     all_cms = []
     all_fold_statistics = []
 
-    range_of_folds = range(1, 6)
-    for fold in range_of_folds:  # 5-fold CV
+    range_of_folds = range(1, 4)  # 3-fold CV for larger validation sets
+    for fold in range_of_folds:  # 3-fold CV
         print(f"==== Fold {fold} ====")
         multi_mag_patients, single_mag_patients, fold_df, fold_statistics = create_multi_mag_dataset_info(folds_df, fold=fold)
         all_fold_statistics.append(fold_statistics)
