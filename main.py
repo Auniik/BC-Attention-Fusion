@@ -15,7 +15,7 @@ from config import get_training_config, TRAINING_CONFIG
 
 from utils.transforms import get_transforms
 
-from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, accuracy_score
+from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, accuracy_score, balanced_accuracy_score
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from backbones import get_all_backbones
@@ -110,49 +110,60 @@ def main():
     all_cms = []
     all_fold_statistics = []
 
-    # OPTIMAL STRATEGY: Train/Val on Fold 1, Test on all other folds
-    main_fold = 1
-    test_folds = [2, 3, 4, 5]
+    # 5-FOLD ROTATION STRATEGY: Train/Val on each fold, test on others
+    all_folds = [1, 2, 3, 4, 5]
     
-    print(f"==== OPTIMAL TRAIN/VAL/TEST SPLIT ====")
-    print(f"📚 Training/Validation: Fold {main_fold} (65 train + 17 test patients = 82 total)")
-    print(f"🧪 Final Test: Folds {test_folds} (17 patients per fold × 4 = 68 test patients)")
+    print(f"==== 5-FOLD ROTATION STRATEGY ====")
+    print(f"🔄 Each fold will be used as train/val, with others as test")
+    print(f"📊 This gives 5 independent test results for better generalizability")
     print(f"✅ Zero patient overlap between train/val and test sets")
     
-    # Get main fold for training/validation
-    main_multi_mag, _, main_fold_df, main_stats = create_multi_mag_dataset_info(folds_df, fold=main_fold)
+    # Storage for all rotation results
+    all_rotation_results = []
+    all_test_results = []
     
-    # Collect all test patients from other folds
-    all_test_multi_mag = []
-    all_test_fold_df_list = []
-    
-    for test_fold in test_folds:
-        test_multi_mag, _, test_fold_df, _ = create_multi_mag_dataset_info(folds_df, fold=test_fold)
-        # Get only test patients from this fold
-        test_patients = get_patients_for_mode(test_multi_mag, test_fold_df, mode='test')
-        all_test_multi_mag.extend(test_patients)
+    # Rotate through each fold as train/val
+    for main_fold in all_folds:
+        test_folds = [f for f in all_folds if f != main_fold]
         
-        # Get test samples from this fold
-        test_samples = test_fold_df[test_fold_df['grp'] == 'test'].copy()
-        all_test_fold_df_list.append(test_samples)
-    
-    # Combine all test fold data
-    import pandas as pd
-    combined_test_fold_df = pd.concat(all_test_fold_df_list, ignore_index=True)
-    
-    print(f"📊 Main fold patients: {len(main_multi_mag)} total")
-    print(f"📊 Test patients collected: {len(all_test_multi_mag)} from {len(test_folds)} folds")
-    print(f"📊 Test samples collected: {len(combined_test_fold_df)}")
-    
-    # Use main fold for training/validation split
-    fold = main_fold
-    multi_mag_patients = main_multi_mag
-    fold_df = main_fold_df
-    fold_statistics = main_stats
-    all_fold_statistics.append(fold_statistics)
-    
-    range_of_folds = [main_fold]  # Single iteration
-    for fold in range_of_folds:
+        print(f"\n{'='*80}")
+        print(f"🔄 ROTATION {main_fold}/5: Train/Val on Fold {main_fold}, Test on Folds {test_folds}")
+        print(f"{'='*80}")
+        
+        # Get main fold for training/validation
+        main_multi_mag, _, main_fold_df, main_stats = create_multi_mag_dataset_info(folds_df, fold=main_fold)
+        
+        # Collect all test patients from other folds
+        all_test_multi_mag = []
+        all_test_fold_df_list = []
+        
+        for test_fold in test_folds:
+            test_multi_mag, _, test_fold_df, _ = create_multi_mag_dataset_info(folds_df, fold=test_fold)
+            # Get only test patients from this fold
+            test_patients = get_patients_for_mode(test_multi_mag, test_fold_df, mode='test')
+            all_test_multi_mag.extend(test_patients)
+            
+            # Get test samples from this fold
+            test_samples = test_fold_df[test_fold_df['grp'] == 'test'].copy()
+            all_test_fold_df_list.append(test_samples)
+        
+        # Combine all test fold data
+        import pandas as pd
+        combined_test_fold_df = pd.concat(all_test_fold_df_list, ignore_index=True)
+        
+        print(f"📊 Train/Val fold {main_fold}: {len(main_multi_mag)} total patients")
+        print(f"📊 Test patients: {len(all_test_multi_mag)} from folds {test_folds}")
+        print(f"📊 Test samples: {len(combined_test_fold_df)}")
+        
+        # Use main fold for training/validation split
+        fold = main_fold
+        multi_mag_patients = main_multi_mag
+        fold_df = main_fold_df
+        fold_statistics = main_stats
+        all_fold_statistics.append(fold_statistics)
+        
+        range_of_folds = [main_fold]  # Single iteration for this rotation
+        for fold in range_of_folds:
         print(f"==== Training on Fold {fold} ====")
 
         # Train on train samples from main fold
@@ -326,20 +337,77 @@ def main():
     
     test_accuracy = accuracy_score(test_labels, test_preds)
     test_f1 = f1_score(test_labels, test_preds, average='binary')
-    print(f"\n🎯 FINAL TEST ACCURACY: {test_accuracy:.4f}")
-    print(f"🎯 FINAL TEST F1 SCORE: {test_f1:.4f}")
-    print(f"{'='*80}")
-
-    print_cross_fold_summary(all_fold_statistics)
-    print_fold_metrics(per_fold_results)
-    plot_all_fold_confusion_matrices(all_cms, save_path='figs/all_fold_confusion_matrices.png')
-    plot_training_metrics(all_fold_histories, save_path='figs/training_metrics.png')
+    test_balanced_acc = balanced_accuracy_score(test_labels, test_preds)
     
-    print(f"\n🎉 TRAINING COMPLETE!")
-    print(f"📊 Training completed on Fold {main_fold} train patients (65 patients)")
-    print(f"📊 Validation performed on Fold {main_fold} test patients (17 patients)")  
-    print(f"📊 Final test evaluation on Folds {test_folds} test patients (68 patients)")
-    print(f"✅ Zero patient overlap between train/val ({main_fold}) and test ({test_folds})")
+    print(f"\n🎯 ROTATION {main_fold} RESULTS:")
+    print(f"   Test Accuracy: {test_accuracy:.4f}")
+    print(f"   Test F1 Score: {test_f1:.4f}")
+    print(f"   Test Balanced Acc: {test_balanced_acc:.4f}")
+    print(f"{'='*80}")
+    
+    # Store results for this rotation
+    rotation_result = {
+        'main_fold': main_fold,
+        'test_folds': test_folds,
+        'val_accuracy': per_fold_results[-1]['accuracy'],
+        'val_f1': per_fold_results[-1]['f1'],
+        'test_accuracy': test_accuracy,
+        'test_f1': test_f1,
+        'test_balanced_acc': test_balanced_acc,
+        'test_samples': len(test_labels)
+    }
+    all_rotation_results.append(rotation_result)
+    all_test_results.extend(test_preds.tolist())
+
+# FINAL SUMMARY ACROSS ALL ROTATIONS
+print(f"\n{'='*80}")
+print(f"🏆 FINAL SUMMARY: 5-FOLD ROTATION RESULTS")
+print(f"{'='*80}")
+
+# Calculate statistics across all rotations
+val_accuracies = [r['val_accuracy'] for r in all_rotation_results]
+test_accuracies = [r['test_accuracy'] for r in all_rotation_results]
+test_f1s = [r['test_f1'] for r in all_rotation_results]
+
+print(f"\n📊 VALIDATION RESULTS (across 5 rotations):")
+print(f"   Mean: {np.mean(val_accuracies):.4f} ± {np.std(val_accuracies):.4f}")
+print(f"   Range: {np.min(val_accuracies):.4f} - {np.max(val_accuracies):.4f}")
+
+print(f"\n🧪 TEST RESULTS (across 5 rotations):")
+print(f"   Mean Accuracy: {np.mean(test_accuracies):.4f} ± {np.std(test_accuracies):.4f}")
+print(f"   Mean F1: {np.mean(test_f1s):.4f} ± {np.std(test_f1s):.4f}")
+print(f"   Range: {np.min(test_accuracies):.4f} - {np.max(test_accuracies):.4f}")
+
+print(f"\n📋 DETAILED ROTATION RESULTS:")
+for i, result in enumerate(all_rotation_results, 1):
+    print(f"   Rotation {i}: Val={result['val_accuracy']:.4f}, Test={result['test_accuracy']:.4f}")
+
+# Check for suspicious perfect results
+perfect_count = sum(1 for acc in test_accuracies if acc >= 0.999)
+if perfect_count > 0:
+    print(f"\n⚠️  WARNING: {perfect_count}/5 rotations achieved perfect test accuracy!")
+    print(f"   This suggests possible remaining data leakage or overfitting")
+else:
+    print(f"\n✅ Realistic test accuracy range - no perfect scores detected")
+
+print(f"\n🎯 FINAL ASSESSMENT:")
+mean_test_acc = np.mean(test_accuracies)
+if mean_test_acc >= 0.95:
+    print(f"   🎉 EXCELLENT: Mean test accuracy {mean_test_acc:.1%}")
+elif mean_test_acc >= 0.90:
+    print(f"   ✅ GOOD: Mean test accuracy {mean_test_acc:.1%}")  
+else:
+    print(f"   📈 ROOM FOR IMPROVEMENT: Mean test accuracy {mean_test_acc:.1%}")
+
+print(f"{'='*80}")
+
+print_cross_fold_summary(all_fold_statistics)
+plot_training_metrics(all_fold_histories, save_path='figs/training_metrics.png')
+    
+print(f"\n🎉 ALL 5 ROTATIONS COMPLETE!")
+print(f"📊 Each fold used as train/val with others as test")
+print(f"📊 Total test evaluations: {len(all_rotation_results)} independent rotations") 
+print(f"✅ Comprehensive evaluation with zero patient overlap")
     
     # Skip ensemble evaluation for single model training
     """
