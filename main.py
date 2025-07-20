@@ -89,12 +89,6 @@ def main():
 
 
     models = get_all_backbones()
-    model = models['our_model'].to(device)
-    
-    # Enable multi-GPU training if available
-    if num_gpus > 1:
-        model = torch.nn.DataParallel(model)
-        print(f"Model wrapped with DataParallel for {num_gpus} GPUs")
 
     seed_everything(42)
 
@@ -124,6 +118,13 @@ def main():
     
     # Rotate through each fold as train/val
     for main_fold in all_folds:
+        # Create fresh model for each rotation
+        model = models['our_model'].to(device)
+        
+        # Enable multi-GPU training if available
+        if num_gpus > 1:
+            model = torch.nn.DataParallel(model)
+            print(f"Model wrapped with DataParallel for {num_gpus} GPUs")
         test_folds = [f for f in all_folds if f != main_fold]
         
         print(f"\n{'='*80}")
@@ -148,13 +149,10 @@ def main():
             all_test_fold_df_list.append(test_samples)
         
         # Combine all test fold data
-        import pandas as pd
         combined_test_fold_df = pd.concat(all_test_fold_df_list, ignore_index=True)
-        
         print(f"📊 Train/Val fold {main_fold}: {len(main_multi_mag)} total patients")
         print(f"📊 Test patients: {len(all_test_multi_mag)} from folds {test_folds}")
-        print(f"📊 Test samples: {len(combined_test_fold_df)}")
-        
+        print(f"📊 Test samples: {len(combined_test_fold_df)}")        
         # Use main fold for training/validation split
         fold = main_fold
         multi_mag_patients = main_multi_mag
@@ -162,9 +160,8 @@ def main():
         fold_statistics = main_stats
         all_fold_statistics.append(fold_statistics)
         
-        range_of_folds = [main_fold]  # Single iteration for this rotation
-        for fold in range_of_folds:
-        print(f"==== Training on Fold {fold} ====")
+        print(f"==== Training on Fold {main_fold} ====")
+        fold = main_fold
 
         # Train on train samples from main fold
         train_patients = get_patients_for_mode(multi_mag_patients, fold_df, mode='train')
@@ -357,57 +354,57 @@ def main():
         'test_samples': len(test_labels)
     }
     all_rotation_results.append(rotation_result)
-    all_test_results.extend(test_preds.tolist())
+        all_test_results.extend(test_preds.tolist())
 
-# FINAL SUMMARY ACROSS ALL ROTATIONS
-print(f"\n{'='*80}")
-print(f"🏆 FINAL SUMMARY: 5-FOLD ROTATION RESULTS")
-print(f"{'='*80}")
+    # FINAL SUMMARY ACROSS ALL ROTATIONS
+    print(f"\n{'='*80}")
+    print(f"🏆 FINAL SUMMARY: 5-FOLD ROTATION RESULTS")
+    print(f"{'='*80}")
 
-# Calculate statistics across all rotations
-val_accuracies = [r['val_accuracy'] for r in all_rotation_results]
-test_accuracies = [r['test_accuracy'] for r in all_rotation_results]
-test_f1s = [r['test_f1'] for r in all_rotation_results]
+    # Calculate statistics across all rotations
+    val_accuracies = [r['val_accuracy'] for r in all_rotation_results]
+    test_accuracies = [r['test_accuracy'] for r in all_rotation_results]
+    test_f1s = [r['test_f1'] for r in all_rotation_results]
 
-print(f"\n📊 VALIDATION RESULTS (across 5 rotations):")
-print(f"   Mean: {np.mean(val_accuracies):.4f} ± {np.std(val_accuracies):.4f}")
-print(f"   Range: {np.min(val_accuracies):.4f} - {np.max(val_accuracies):.4f}")
+    print(f"\n📊 VALIDATION RESULTS (across 5 rotations):")
+    print(f"   Mean: {np.mean(val_accuracies):.4f} ± {np.std(val_accuracies):.4f}")
+    print(f"   Range: {np.min(val_accuracies):.4f} - {np.max(val_accuracies):.4f}")
 
-print(f"\n🧪 TEST RESULTS (across 5 rotations):")
-print(f"   Mean Accuracy: {np.mean(test_accuracies):.4f} ± {np.std(test_accuracies):.4f}")
-print(f"   Mean F1: {np.mean(test_f1s):.4f} ± {np.std(test_f1s):.4f}")
-print(f"   Range: {np.min(test_accuracies):.4f} - {np.max(test_accuracies):.4f}")
+    print(f"\n🧪 TEST RESULTS (across 5 rotations):")
+    print(f"   Mean Accuracy: {np.mean(test_accuracies):.4f} ± {np.std(test_accuracies):.4f}")
+    print(f"   Mean F1: {np.mean(test_f1s):.4f} ± {np.std(test_f1s):.4f}")
+    print(f"   Range: {np.min(test_accuracies):.4f} - {np.max(test_accuracies):.4f}")
 
-print(f"\n📋 DETAILED ROTATION RESULTS:")
-for i, result in enumerate(all_rotation_results, 1):
-    print(f"   Rotation {i}: Val={result['val_accuracy']:.4f}, Test={result['test_accuracy']:.4f}")
+    print(f"\n📋 DETAILED ROTATION RESULTS:")
+    for i, result in enumerate(all_rotation_results, 1):
+        print(f"   Rotation {i}: Val={result['val_accuracy']:.4f}, Test={result['test_accuracy']:.4f}")
 
-# Check for suspicious perfect results
-perfect_count = sum(1 for acc in test_accuracies if acc >= 0.999)
-if perfect_count > 0:
-    print(f"\n⚠️  WARNING: {perfect_count}/5 rotations achieved perfect test accuracy!")
-    print(f"   This suggests possible remaining data leakage or overfitting")
-else:
-    print(f"\n✅ Realistic test accuracy range - no perfect scores detected")
+    # Check for suspicious perfect results
+    perfect_count = sum(1 for acc in test_accuracies if acc >= 0.999)
+    if perfect_count > 0:
+        print(f"\n⚠️  WARNING: {perfect_count}/5 rotations achieved perfect test accuracy!")
+        print(f"   This suggests possible remaining data leakage or overfitting")
+    else:
+        print(f"\n✅ Realistic test accuracy range - no perfect scores detected")
 
-print(f"\n🎯 FINAL ASSESSMENT:")
-mean_test_acc = np.mean(test_accuracies)
-if mean_test_acc >= 0.95:
-    print(f"   🎉 EXCELLENT: Mean test accuracy {mean_test_acc:.1%}")
-elif mean_test_acc >= 0.90:
-    print(f"   ✅ GOOD: Mean test accuracy {mean_test_acc:.1%}")  
-else:
-    print(f"   📈 ROOM FOR IMPROVEMENT: Mean test accuracy {mean_test_acc:.1%}")
+    print(f"\n🎯 FINAL ASSESSMENT:")
+    mean_test_acc = np.mean(test_accuracies)
+    if mean_test_acc >= 0.95:
+        print(f"   🎉 EXCELLENT: Mean test accuracy {mean_test_acc:.1%}")
+    elif mean_test_acc >= 0.90:
+        print(f"   ✅ GOOD: Mean test accuracy {mean_test_acc:.1%}")  
+    else:
+        print(f"   📈 ROOM FOR IMPROVEMENT: Mean test accuracy {mean_test_acc:.1%}")
 
-print(f"{'='*80}")
+    print(f"{'='*80}")
 
-print_cross_fold_summary(all_fold_statistics)
-plot_training_metrics(all_fold_histories, save_path='figs/training_metrics.png')
-    
-print(f"\n🎉 ALL 5 ROTATIONS COMPLETE!")
-print(f"📊 Each fold used as train/val with others as test")
-print(f"📊 Total test evaluations: {len(all_rotation_results)} independent rotations") 
-print(f"✅ Comprehensive evaluation with zero patient overlap")
+    print_cross_fold_summary(all_fold_statistics)
+    plot_training_metrics(all_fold_histories, save_path='figs/training_metrics.png')
+        
+    print(f"\n🎉 ALL 5 ROTATIONS COMPLETE!")
+    print(f"📊 Each fold used as train/val with others as test")
+    print(f"📊 Total test evaluations: {len(all_rotation_results)} independent rotations") 
+    print(f"✅ Comprehensive evaluation with zero patient overlap")
     
     # Skip ensemble evaluation for single model training
     """
