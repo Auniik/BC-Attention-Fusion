@@ -75,24 +75,27 @@ def plot_training_metrics(history_dict, save_path=None):
         
         # Use one unique color per fold, with dashed (train) vs solid (val)
         for i in range(num_folds):
-            axs[0].plot(epochs, history_dict['train_loss'][i], linestyle='--', color=colors[i], label=f'Train Fold {i+1}')
-            axs[0].plot(epochs, history_dict['val_loss'][i], linestyle='-',  color=colors[i], label=f'Val Fold {i+1}')
+            fold_epochs = range(1, len(history_dict['train_loss'][i]) + 1)
+            axs[0].plot(fold_epochs, history_dict['train_loss'][i], linestyle='--', color=colors[i], label=f'Train Fold {i+1}')
+            axs[0].plot(fold_epochs, history_dict['val_loss'][i], linestyle='-',  color=colors[i], label=f'Val Fold {i+1}')
         axs[0].set_ylabel('Loss')
         axs[0].set_title('(a) Loss')
         axs[0].grid(True, linestyle='--', alpha=0.6)
         axs[0].legend(loc='upper right', ncol=2)
         
         for i in range(num_folds):
-            axs[1].plot(epochs, history_dict['train_acc'][i], linestyle='--', color=colors[i], label=f'Train Fold {i+1}')
-            axs[1].plot(epochs, history_dict['val_acc'][i], linestyle='-',  color=colors[i], label=f'Val Fold {i+1}')
+            fold_epochs = range(1, len(history_dict['train_acc'][i]) + 1)
+            axs[1].plot(fold_epochs, history_dict['train_acc'][i], linestyle='--', color=colors[i], label=f'Train Fold {i+1}')
+            axs[1].plot(fold_epochs, history_dict['val_acc'][i], linestyle='-',  color=colors[i], label=f'Val Fold {i+1}')
         axs[1].set_ylabel('Accuracy')
         axs[1].set_title('(b) Accuracy')
         axs[1].grid(True, linestyle='--', alpha=0.6)
         axs[1].legend(loc='lower right', ncol=2)
         
         for i in range(num_folds):
-            axs[2].plot(epochs, history_dict['train_f1'][i], linestyle='--', color=colors[i], label=f'Train Fold {i+1}')
-            axs[2].plot(epochs, history_dict['val_f1'][i], linestyle='-',  color=colors[i], label=f'Val Fold {i+1}')
+            fold_epochs = range(1, len(history_dict['train_f1'][i]) + 1)
+            axs[2].plot(fold_epochs, history_dict['train_f1'][i], linestyle='--', color=colors[i], label=f'Train Fold {i+1}')
+            axs[2].plot(fold_epochs, history_dict['val_f1'][i], linestyle='-',  color=colors[i], label=f'Val Fold {i+1}')
         axs[2].set_xlabel('Epoch')
         axs[2].set_ylabel('F1-Score')
         axs[2].set_title('(c) F1-Score')
