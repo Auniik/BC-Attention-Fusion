@@ -7,10 +7,10 @@ torchvision>=0.15.0
 timm>=0.9.0
 
 # Scientific computing
-numpy>=1.21.0
+numpy
 scipy>=1.7.0
 scikit-learn>=1.0.0
-pandas>=1.3.0
+pandas
 
 # Computer vision
 opencv-python>=4.5.0
@@ -40,3 +40,5 @@ setuptools
 packaging
 filelock
 fsspec
+
+tabulate
