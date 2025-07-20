@@ -132,10 +132,13 @@ def main():
         base_batch_size = 8
         effective_batch_size = base_batch_size * max(1, num_gpus)
         
-        train_loader = DataLoader(train_dataset, batch_size=effective_batch_size, shuffle=True, num_workers=4,
-                                worker_init_fn=seed_worker, generator=g, pin_memory=True)
-        val_loader = DataLoader(val_dataset, batch_size=effective_batch_size, shuffle=False, num_workers=4,
-                                worker_init_fn=seed_worker, generator=g, pin_memory=True)
+        # Reduce num_workers to avoid multiprocessing issues
+        num_workers = 2 if num_gpus > 1 else 0  # Use fewer workers for multi-GPU to avoid crashes
+        
+        train_loader = DataLoader(train_dataset, batch_size=effective_batch_size, shuffle=True, num_workers=num_workers,
+                                worker_init_fn=seed_worker, generator=g, pin_memory=True, persistent_workers=num_workers > 0)
+        val_loader = DataLoader(val_dataset, batch_size=effective_batch_size, shuffle=False, num_workers=num_workers,
+                                worker_init_fn=seed_worker, generator=g, pin_memory=True, persistent_workers=num_workers > 0)
         
         print(f"Using batch size: {effective_batch_size} (base: {base_batch_size} x {max(1, num_gpus)} GPUs)")
 
@@ -167,7 +170,7 @@ def main():
         all_cms.append(cm)
 
         # Load best model - handle DataParallel wrapper
-        checkpoint = torch.load(f'output/best_model_fold_{fold}.pth')
+        checkpoint = torch.load(f'output/best_model_fold_{fold}.pth', map_location=device)
         if hasattr(model, 'module'):
             # Model is wrapped with DataParallel
             model.module.load_state_dict(checkpoint)

@@ -9,7 +9,7 @@ from sklearn.utils.class_weight import compute_class_weight
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.amp import autocast, GradScaler
+from torch.cuda.amp import autocast, GradScaler
 
 
 def get_loss_weights(fold_df, device):
