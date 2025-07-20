@@ -9,7 +9,12 @@ from sklearn.utils.class_weight import compute_class_weight
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.cuda.amp import autocast, GradScaler
+try:
+    from torch.amp import autocast
+    from torch.cuda.amp import GradScaler
+except ImportError:
+    # Fallback for older PyTorch versions
+    from torch.cuda.amp import autocast, GradScaler
 
 
 def get_loss_weights(fold_df, device):
@@ -102,7 +107,7 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
             
             # Forward pass with mixed precision
             if use_amp:
-                with autocast():
+                with autocast('cuda'):
                     class_logits, tumor_logits = model(images_dict)
                     
                     # Calculate losses
@@ -164,7 +169,7 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
                 
                 # Forward pass with mixed precision
                 if use_amp:
-                    with autocast():
+                    with autocast('cuda'):
                         class_logits, tumor_logits = model(images_dict)
                         
                         # Calculate losses
