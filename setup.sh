@@ -26,6 +26,10 @@ echo ""
 echo "⚡ Using base container PyTorch 2.1.0 with CUDA 11.8..."
 echo "   (Skipping PyTorch reinstallation to save time)"
 
+# Fix NumPy compatibility with PyTorch 2.1.0
+echo "🔧 Fixing NumPy compatibility..."
+pip install "numpy<2.0.0" --force-reinstall
+
 # Install only missing dependencies
 echo "📚 Installing additional project dependencies..."
 pip install -r requirements.txt.runpod
