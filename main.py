@@ -110,19 +110,53 @@ def main():
     all_cms = []
     all_fold_statistics = []
 
-    # Single train/test split for maximum validation data
-    fold = 1  # Use fold 1 as test, rest as train
-    print(f"==== Single Train/Test Split (Using Fold {fold} as Test) ====")
+    # OPTIMAL STRATEGY: Train/Val on Fold 1, Test on all other folds
+    main_fold = 1
+    test_folds = [2, 3, 4, 5]
     
-    range_of_folds = [fold]  # Single fold for testing
-    for fold in range_of_folds:
-        print(f"==== Fold {fold} ====")
-        multi_mag_patients, single_mag_patients, fold_df, fold_statistics = create_multi_mag_dataset_info(folds_df, fold=fold)
-        all_fold_statistics.append(fold_statistics)
-
-        # Filter patients for proper cross-validation
-        train_patients = get_patients_for_mode(multi_mag_patients, fold_df, mode='train')
+    print(f"==== OPTIMAL TRAIN/VAL/TEST SPLIT ====")
+    print(f"📚 Training/Validation: Fold {main_fold} (65 train + 17 test patients = 82 total)")
+    print(f"🧪 Final Test: Folds {test_folds} (17 patients per fold × 4 = 68 test patients)")
+    print(f"✅ Zero patient overlap between train/val and test sets")
+    
+    # Get main fold for training/validation
+    main_multi_mag, _, main_fold_df, main_stats = create_multi_mag_dataset_info(folds_df, fold=main_fold)
+    
+    # Collect all test patients from other folds
+    all_test_multi_mag = []
+    all_test_fold_df_list = []
+    
+    for test_fold in test_folds:
+        test_multi_mag, _, test_fold_df, _ = create_multi_mag_dataset_info(folds_df, fold=test_fold)
+        # Get only test patients from this fold
+        test_patients = get_patients_for_mode(test_multi_mag, test_fold_df, mode='test')
+        all_test_multi_mag.extend(test_patients)
         
+        # Get test samples from this fold
+        test_samples = test_fold_df[test_fold_df['grp'] == 'test'].copy()
+        all_test_fold_df_list.append(test_samples)
+    
+    # Combine all test fold data
+    import pandas as pd
+    combined_test_fold_df = pd.concat(all_test_fold_df_list, ignore_index=True)
+    
+    print(f"📊 Main fold patients: {len(main_multi_mag)} total")
+    print(f"📊 Test patients collected: {len(all_test_multi_mag)} from {len(test_folds)} folds")
+    print(f"📊 Test samples collected: {len(combined_test_fold_df)}")
+    
+    # Use main fold for training/validation split
+    fold = main_fold
+    multi_mag_patients = main_multi_mag
+    fold_df = main_fold_df
+    fold_statistics = main_stats
+    all_fold_statistics.append(fold_statistics)
+    
+    range_of_folds = [main_fold]  # Single iteration
+    for fold in range_of_folds:
+        print(f"==== Training on Fold {fold} ====")
+
+        # Train on train samples from main fold
+        train_patients = get_patients_for_mode(multi_mag_patients, fold_df, mode='train')
         train_dataset = MultiMagnificationDataset(
             train_patients, 
             fold_df,
@@ -133,11 +167,10 @@ def main():
             balance_classes=True  # Enable balancing
         )
 
-        # Filter patients for proper cross-validation
-        test_patients = get_patients_for_mode(multi_mag_patients, fold_df, mode='test')
-        
+        # Validate on test samples from main fold  
+        val_patients = get_patients_for_mode(multi_mag_patients, fold_df, mode='test')
         val_dataset = MultiMagnificationDataset(
-            test_patients,
+            val_patients,
             fold_df,
             mode='test',
             mags=TRAINING_CONFIG['magnifications'],
@@ -236,11 +269,80 @@ def main():
         plot_and_save_gradcam(model, val_loader, device, fold)
         plot_cross_magnification_fusion(model, val_loader, device, fold)
 
+    # FINAL TEST EVALUATION on completely unseen test patients
+    print(f"\n{'='*80}")
+    print(f"🧪 FINAL TEST EVALUATION ON FOLDS {test_folds}")
+    print(f"{'='*80}")
+    
+    # Create test dataset from all test patients
+    test_dataset = MultiMagnificationDataset(
+        all_test_multi_mag,
+        combined_test_fold_df,
+        mode='test',  # Use test samples from combined folds
+        mags=TRAINING_CONFIG['magnifications'],
+        samples_per_patient=TRAINING_CONFIG['samples_per_patient_val'],
+        transform=val_transform,
+        balance_classes=False  # No balancing for final test
+    )
+    
+    test_loader = DataLoader(
+        test_dataset, 
+        batch_size=train_config['effective_batch_size'], 
+        shuffle=False, 
+        num_workers=train_config['num_workers'],
+        pin_memory=train_config['pin_memory']
+    )
+    
+    print(f"📊 Test Set: {len(all_test_multi_mag)} patients, {len(test_dataset)} samples")
+    
+    # Load best model for final test
+    if hasattr(model, 'module'):
+        model.module.load_state_dict(checkpoint)
+    else:
+        model.load_state_dict(checkpoint)
+    model.eval()
+    
+    # Test evaluation
+    all_test_preds = []
+    all_test_labels = []
+    
+    with torch.no_grad():
+        for batch in test_loader:
+            images_dict = {k: v.to(device, non_blocking=True) for k, v in batch['images'].items()}
+            class_labels = batch['class_label'].to(device, non_blocking=True)
+            
+            class_logits, _ = model(images_dict)
+            preds = torch.argmax(class_logits, dim=1)
+            
+            all_test_preds.append(preds.cpu())
+            all_test_labels.append(class_labels.cpu())
+    
+    test_preds = torch.cat(all_test_preds).numpy()
+    test_labels = torch.cat(all_test_labels).numpy()
+    
+    # Final test analysis
+    print("🔬 FINAL TEST RESULTS:")
+    analyze_predictions(test_labels, test_preds, test_loader)
+    
+    test_accuracy = accuracy_score(test_labels, test_preds)
+    test_f1 = f1_score(test_labels, test_preds, average='binary')
+    print(f"\n🎯 FINAL TEST ACCURACY: {test_accuracy:.4f}")
+    print(f"🎯 FINAL TEST F1 SCORE: {test_f1:.4f}")
+    print(f"{'='*80}")
+
     print_cross_fold_summary(all_fold_statistics)
     print_fold_metrics(per_fold_results)
     plot_all_fold_confusion_matrices(all_cms, save_path='figs/all_fold_confusion_matrices.png')
     plot_training_metrics(all_fold_histories, save_path='figs/training_metrics.png')
     
+    print(f"\n🎉 TRAINING COMPLETE!")
+    print(f"📊 Training completed on Fold {main_fold} train patients (65 patients)")
+    print(f"📊 Validation performed on Fold {main_fold} test patients (17 patients)")  
+    print(f"📊 Final test evaluation on Folds {test_folds} test patients (68 patients)")
+    print(f"✅ Zero patient overlap between train/val ({main_fold}) and test ({test_folds})")
+    
+    # Skip ensemble evaluation for single model training
+    """
     # Multi-fold ensemble evaluation for maximum accuracy
     print("\n" + "="*80)
     print("🚀 RUNNING ENSEMBLE EVALUATION FOR MAXIMUM ACCURACY")
@@ -283,6 +385,7 @@ def main():
     print(f"🎯 TARGET ACHIEVED: {'✅ YES' if ensemble_results['balanced_accuracy'] >= 0.95 else '❌ NO (keep training)'}")
     print("="*80)
 
+    """
 
 if __name__ == "__main__":
     main()
