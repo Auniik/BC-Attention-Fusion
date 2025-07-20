@@ -114,7 +114,7 @@ def main():
             fold_df,
             mode='train',
             mags=[40, 100, 200, 400],
-            samples_per_patient=8,  # Increase for better epoch coverage
+            samples_per_patient=16,  # Increased for better coverage and harder examples
             transform=train_transform,
             balance_classes=True  # Enable balancing
         )
@@ -124,7 +124,7 @@ def main():
             fold_df,
             mode='test',
             mags=[40, 100, 200, 400],
-            samples_per_patient=2,
+            samples_per_patient=4,  # Increased for more robust validation
             transform=val_transform
         )
 
@@ -149,7 +149,7 @@ def main():
             val_loader,
             fold_df,
             fold=fold,
-            num_epochs=5,
+            num_epochs=25,  # Extended training for better convergence
             device=device
         )
 
@@ -186,6 +186,48 @@ def main():
     print_fold_metrics(per_fold_results)
     plot_all_fold_confusion_matrices(all_cms, save_path='figs/all_fold_confusion_matrices.png')
     plot_training_metrics(all_fold_histories, save_path='figs/training_metrics.png')
+    
+    # Multi-fold ensemble evaluation for maximum accuracy
+    print("\n" + "="*80)
+    print("🚀 RUNNING ENSEMBLE EVALUATION FOR MAXIMUM ACCURACY")
+    print("="*80)
+    
+    # Load all fold models
+    ensemble_models = []
+    fold_weights = []
+    
+    for fold in range_of_folds:
+        # Create a fresh model instance
+        fold_model = models['our_model']
+        
+        # Load the best checkpoint for this fold
+        checkpoint = torch.load(f'output/best_model_fold_{fold}.pth', map_location=device)
+        if hasattr(fold_model, 'module'):
+            fold_model.module.load_state_dict(checkpoint)
+        else:
+            fold_model.load_state_dict(checkpoint)
+        fold_model.eval()
+        
+        ensemble_models.append(fold_model)
+        
+        # Weight by fold performance (balanced accuracy)
+        fold_performance = per_fold_results[fold-1]['f1']  # Use F1 as weight
+        fold_weights.append(fold_performance)
+    
+    # Create validation dataset for ensemble evaluation
+    # Use the last fold's validation set as representative
+    from ensemble import run_ensemble_evaluation
+    
+    ensemble_results = run_ensemble_evaluation(
+        models=ensemble_models,
+        val_loader=val_loader,  # Use last validation loader
+        device=device,
+        fold_weights=fold_weights
+    )
+    
+    print(f"\n🎯 FINAL ENSEMBLE ACCURACY: {ensemble_results['balanced_accuracy']:.4f}")
+    print(f"🎯 TARGET ACHIEVED: {'✅ YES' if ensemble_results['balanced_accuracy'] >= 0.95 else '❌ NO (keep training)'}")
+    print("="*80)
 
 
 if __name__ == "__main__":

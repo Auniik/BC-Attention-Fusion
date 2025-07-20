@@ -1,6 +1,6 @@
 import torch.optim as optim
-from torch.optim.lr_scheduler import CosineAnnealingLR
-from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, classification_report
+from torch.optim.lr_scheduler import CosineAnnealingLR, OneCycleLR, CosineAnnealingWarmRestarts
+from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, classification_report, balanced_accuracy_score
 import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
@@ -49,27 +49,67 @@ class FocalLoss(nn.Module):
         focal_loss = self.alpha * (1-pt)**self.gamma * ce_loss
         return focal_loss.mean()
 
+class LabelSmoothingCrossEntropy(nn.Module):
+    def __init__(self, smoothing=0.1, weight=None):
+        super().__init__()
+        self.smoothing = smoothing
+        self.weight = weight
+        
+    def forward(self, input, target):
+        log_prob = F.log_softmax(input, dim=-1)
+        weight = self.weight
+        if weight is not None:
+            weight = weight.unsqueeze(0)
+            
+        nll_loss = -log_prob.gather(dim=-1, index=target.unsqueeze(1))
+        nll_loss = nll_loss.squeeze(1)
+        if weight is not None:
+            nll_loss = nll_loss * weight.gather(dim=-1, index=target.unsqueeze(1)).squeeze(1)
+            
+        smooth_loss = -log_prob.mean(dim=-1)
+        if weight is not None:
+            smooth_loss = smooth_loss * weight.mean()
+            
+        loss = (1 - self.smoothing) * nll_loss + self.smoothing * smooth_loss
+        return loss.mean()
+
+def get_warmup_scheduler(optimizer, warmup_epochs, total_epochs):
+    """Create a learning rate scheduler with warmup"""
+    def lr_lambda(epoch):
+        if epoch < warmup_epochs:
+            return float(epoch) / float(max(1, warmup_epochs))
+        else:
+            return 0.5 * (1 + np.cos(np.pi * (epoch - warmup_epochs) / (total_epochs - warmup_epochs)))
+    
+    return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
+
 
 def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, device):
 
     class_weights, tumor_weights = get_loss_weights(fold_df, device)
     
-    # Loss functions
-    # criterion_class = nn.CrossEntropyLoss(weight=class_weights, label_smoothing=0.05)
-    criterion_class = FocalLoss(alpha=2.5, gamma=2) 
+    # Enhanced loss functions - Label smoothing for better generalization
+    criterion_class = nn.CrossEntropyLoss(weight=class_weights, label_smoothing=0.1)
     criterion_tumor = nn.CrossEntropyLoss(weight=tumor_weights, label_smoothing=0.05)
     
-    # Optimizer
-    optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    # Optimizer with reduced learning rate and better weight decay
+    optimizer = optim.AdamW(model.parameters(), lr=5e-4, weight_decay=1e-3, betas=(0.9, 0.999))
     
-    # Learning rate scheduler
-    scheduler = CosineAnnealingLR(optimizer, T_max=num_epochs, eta_min=1e-6)
+    # Advanced learning rate scheduler with warmup
+    warmup_epochs = 3
+    scheduler = get_warmup_scheduler(optimizer, warmup_epochs, num_epochs)
+    
+    # Early stopping parameters
+    best_balanced_acc = 0.0
+    patience = 8
+    patience_counter = 0
     
     
-    # Training history
+    # Training history with additional metrics
     history = {
-        'train_loss': [], 'train_acc': [], 'train_f1': [],
-        'val_loss': [], 'val_acc': [], 'val_f1': [], 'val_tumor_acc': []
+        'train_loss': [], 'train_acc': [], 'train_f1': [], 'train_balanced_acc': [],
+        'val_loss': [], 'val_acc': [], 'val_f1': [], 'val_balanced_acc': [], 'val_tumor_acc': [],
+        'learning_rate': []
     }
     
     best_val_acc = 0.0
@@ -78,6 +118,9 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
     # Initialize variables for final return
     all_preds_np = np.array([])
     all_labels_np = np.array([])
+    
+    print(f"Starting {num_epochs} epoch training with warmup for {warmup_epochs} epochs")
+    print(f"Early stopping patience: {patience} epochs")
     
     for epoch in range(num_epochs):
         print(f"\nEpoch {epoch+1}/{num_epochs}")
@@ -128,6 +171,7 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
         train_loss = running_loss / len(train_loader)
         train_acc = accuracy_score(all_labels_np, all_preds_np)
         train_f1 = f1_score(all_labels_np, all_preds_np, average='weighted')
+        train_balanced_acc = balanced_accuracy_score(all_labels_np, all_preds_np)
         
         # Validation
         model.eval()
@@ -177,7 +221,11 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
         val_loss = running_loss / len(val_loader)
         val_acc = accuracy_score(all_labels_np, all_preds_np)
         val_f1 = f1_score(all_labels_np, all_preds_np, average='weighted')
+        val_balanced_acc = balanced_accuracy_score(all_labels_np, all_preds_np)
         tumor_acc = accuracy_score(all_tumor_labels_np, all_tumor_preds_np)
+        
+        # Get current learning rate
+        current_lr = optimizer.param_groups[0]['lr']
         
         # Update learning rate
         scheduler.step()
@@ -186,24 +234,39 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
         history['train_loss'].append(train_loss)
         history['train_acc'].append(train_acc)
         history['train_f1'].append(train_f1)
+        history['train_balanced_acc'].append(train_balanced_acc)
         history['val_loss'].append(val_loss)
         history['val_acc'].append(val_acc)
         history['val_f1'].append(val_f1)
+        history['val_balanced_acc'].append(val_balanced_acc)
         history['val_tumor_acc'].append(tumor_acc)
+        history['learning_rate'].append(current_lr)
         
         # Print results
-        print(f"Train - Loss: {train_loss:.4f}, Acc: {train_acc:.4f}, F1: {train_f1:.4f}")
-        print(f"Val - Loss: {val_loss:.4f}, Acc: {val_acc:.4f}, F1: {val_f1:.4f}, Tumor Acc: {tumor_acc:.4f}")
-        print(f"Balanced Acc: {balanced_acc:.4f} (B: {benign_acc:.4f}, M: {malignant_acc:.4f})")
+        print(f"Train - Loss: {train_loss:.4f}, Acc: {train_acc:.4f}, F1: {train_f1:.4f}, Bal_Acc: {train_balanced_acc:.4f}")
+        print(f"Val - Loss: {val_loss:.4f}, Acc: {val_acc:.4f}, F1: {val_f1:.4f}, Bal_Acc: {val_balanced_acc:.4f}")
+        print(f"Detailed Bal_Acc: {balanced_acc:.4f} (B: {benign_acc:.4f}, M: {malignant_acc:.4f})")
+        print(f"Tumor Acc: {tumor_acc:.4f}, LR: {current_lr:.2e}")
         
-        # Save best model - handle DataParallel wrapper
-        if balanced_acc > best_val_acc: 
-            best_val_acc = balanced_acc
+        # Early stopping based on balanced accuracy
+        if val_balanced_acc > best_balanced_acc:
+            best_balanced_acc = val_balanced_acc
+            patience_counter = 0
+            
+            # Save best model - handle DataParallel wrapper
             if hasattr(model, 'module'):
-                # Model is wrapped with DataParallel
                 torch.save(model.module.state_dict(), f'output/best_model_fold_{fold}.pth')
             else:
                 torch.save(model.state_dict(), f'output/best_model_fold_{fold}.pth')
-            print(f"Saved best model of Fold-{fold} with validation accuracy: {best_val_acc:.4f}")
+            print(f"🎯 New best balanced accuracy: {best_balanced_acc:.4f} - Model saved!")
+        else:
+            patience_counter += 1
+            print(f"No improvement for {patience_counter}/{patience} epochs")
+            
+        # Early stopping check
+        if patience_counter >= patience:
+            print(f"\n⏹️ Early stopping triggered after {epoch+1} epochs")
+            print(f"Best balanced accuracy: {best_balanced_acc:.4f}")
+            break
     
     return history, all_preds_np, all_labels_np
