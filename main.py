@@ -176,30 +176,51 @@ def main():
             device=device
         )
 
-        analyze_predictions(val_labels, val_preds, val_loader)
-
-        for key in all_fold_histories:
-            all_fold_histories[key].append(history[key])
-
-        fold_metrics = {
-            "fold": fold,
-            "accuracy": accuracy_score(val_labels, val_preds),
-            "precision": precision_score(val_labels, val_preds, average='binary'),
-            "recall": recall_score(val_labels, val_preds, average='binary'),
-            "f1": f1_score(val_labels, val_preds, average='binary')
-        }
-        per_fold_results.append(fold_metrics)
-        cm = confusion_matrix(val_labels, val_preds)
-        all_cms.append(cm)
-
-        # Load best model - handle DataParallel wrapper
-        checkpoint = torch.load(f'output/best_model_fold_{fold}.pth', map_location=device, weights_only=True)
+        # Load best model BEFORE final evaluation - handle DataParallel wrapper
+        print(f"\n📊 Loading best checkpoint for final evaluation...")
+        checkpoint = torch.load(f'output/best_model_fold_{fold}.pth', map_location=device)
         if hasattr(model, 'module'):
             # Model is wrapped with DataParallel
             model.module.load_state_dict(checkpoint)
         else:
             model.load_state_dict(checkpoint)
         model.eval()
+
+        # Re-evaluate with best model for accurate classification report
+        print("🔍 Re-evaluating with best checkpoint...")
+        all_preds_final = []
+        all_labels_final = []
+        
+        with torch.no_grad():
+            for batch in val_loader:
+                images_dict = {k: v.to(device, non_blocking=True) for k, v in batch['images'].items()}
+                class_labels = batch['class_label'].to(device, non_blocking=True)
+                
+                class_logits, _ = model(images_dict)
+                preds = torch.argmax(class_logits, dim=1)
+                
+                all_preds_final.append(preds.cpu())
+                all_labels_final.append(class_labels.cpu())
+        
+        val_preds_final = torch.cat(all_preds_final).numpy()
+        val_labels_final = torch.cat(all_labels_final).numpy()
+
+        # Use final predictions for analysis and metrics
+        analyze_predictions(val_labels_final, val_preds_final, val_loader)
+
+        for key in all_fold_histories:
+            all_fold_histories[key].append(history[key])
+
+        fold_metrics = {
+            "fold": fold,
+            "accuracy": accuracy_score(val_labels_final, val_preds_final),
+            "precision": precision_score(val_labels_final, val_preds_final, average='binary'),
+            "recall": recall_score(val_labels_final, val_preds_final, average='binary'),
+            "f1": f1_score(val_labels_final, val_preds_final, average='binary')
+        }
+        per_fold_results.append(fold_metrics)
+        cm = confusion_matrix(val_labels_final, val_preds_final)
+        all_cms.append(cm)
 
         # Grad-CAM visualization
         plot_and_save_gradcam(model, val_loader, device, fold)
@@ -224,7 +245,7 @@ def main():
         fold_model = models['our_model']
         
         # Load the best checkpoint for this fold
-        checkpoint = torch.load(f'output/best_model_fold_{fold}.pth', map_location=device, weights_only=True)
+        checkpoint = torch.load(f'output/best_model_fold_{fold}.pth', map_location=device)
         if hasattr(fold_model, 'module'):
             fold_model.module.load_state_dict(checkpoint)
         else:
