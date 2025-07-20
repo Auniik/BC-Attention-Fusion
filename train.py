@@ -9,6 +9,7 @@ from sklearn.utils.class_weight import compute_class_weight
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.amp import autocast, GradScaler
 
 
 def get_loss_weights(fold_df, device):
@@ -65,6 +66,12 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
     # Learning rate scheduler
     scheduler = CosineAnnealingLR(optimizer, T_max=num_epochs, eta_min=1e-6)
     
+    # Mixed precision training for tensor cores
+    use_amp = device.type == 'cuda' and torch.cuda.is_available()
+    scaler = GradScaler() if use_amp else None
+    if use_amp:
+        print("Using Automatic Mixed Precision (AMP) for tensor core optimization")
+    
     # Training history
     history = {
         'train_loss': [], 'train_acc': [], 'train_f1': [],
@@ -93,19 +100,36 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
             
             optimizer.zero_grad()
             
-            # Forward pass
-            class_logits, tumor_logits = model(images_dict)
-            
-            # Calculate losses
-            loss_class = criterion_class(class_logits, class_labels)
-            loss_tumor = criterion_tumor(tumor_logits, tumor_labels)
-            
-            # Combined loss
-            loss = 0.9 * loss_class + 0.1 * loss_tumor 
-
-            # Backward pass
-            loss.backward()
-            optimizer.step()
+            # Forward pass with mixed precision
+            if use_amp:
+                with autocast():
+                    class_logits, tumor_logits = model(images_dict)
+                    
+                    # Calculate losses
+                    loss_class = criterion_class(class_logits, class_labels)
+                    loss_tumor = criterion_tumor(tumor_logits, tumor_labels)
+                    
+                    # Combined loss
+                    loss = 0.9 * loss_class + 0.1 * loss_tumor
+                
+                # Backward pass with gradient scaling
+                scaler.scale(loss).backward()
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                # Standard forward pass
+                class_logits, tumor_logits = model(images_dict)
+                
+                # Calculate losses
+                loss_class = criterion_class(class_logits, class_labels)
+                loss_tumor = criterion_tumor(tumor_logits, tumor_labels)
+                
+                # Combined loss
+                loss = 0.9 * loss_class + 0.1 * loss_tumor
+                
+                # Backward pass
+                loss.backward()
+                optimizer.step()
             
             # Statistics - accumulate on GPU to reduce transfers
             running_loss += loss.item()
@@ -138,13 +162,23 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
                 class_labels = batch['class_label'].to(device, non_blocking=True)
                 tumor_labels = batch['tumor_type_label'].to(device, non_blocking=True)
                 
-                # Forward pass
-                class_logits, tumor_logits = model(images_dict)
-                
-                # Calculate losses
-                loss_class = criterion_class(class_logits, class_labels)
-                loss_tumor = criterion_tumor(tumor_logits, tumor_labels)
-                loss = 0.7 * loss_class + 0.3 * loss_tumor
+                # Forward pass with mixed precision
+                if use_amp:
+                    with autocast():
+                        class_logits, tumor_logits = model(images_dict)
+                        
+                        # Calculate losses
+                        loss_class = criterion_class(class_logits, class_labels)
+                        loss_tumor = criterion_tumor(tumor_logits, tumor_labels)
+                        loss = 0.7 * loss_class + 0.3 * loss_tumor
+                else:
+                    # Standard forward pass
+                    class_logits, tumor_logits = model(images_dict)
+                    
+                    # Calculate losses
+                    loss_class = criterion_class(class_logits, class_labels)
+                    loss_tumor = criterion_tumor(tumor_logits, tumor_labels)
+                    loss = 0.7 * loss_class + 0.3 * loss_tumor
                 
                 # Statistics - accumulate on GPU
                 running_loss += loss.item()
@@ -191,10 +225,14 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
         print(f"Val - Loss: {val_loss:.4f}, Acc: {val_acc:.4f}, F1: {val_f1:.4f}, Tumor Acc: {tumor_acc:.4f}")
         print(f"Balanced Acc: {balanced_acc:.4f} (B: {benign_acc:.4f}, M: {malignant_acc:.4f})")
         
-        # Save best model
+        # Save best model - handle DataParallel wrapper
         if balanced_acc > best_val_acc: 
             best_val_acc = balanced_acc
-            torch.save(model.state_dict(), f'output/best_model_fold_{fold}.pth')
+            if hasattr(model, 'module'):
+                # Model is wrapped with DataParallel
+                torch.save(model.module.state_dict(), f'output/best_model_fold_{fold}.pth')
+            else:
+                torch.save(model.state_dict(), f'output/best_model_fold_{fold}.pth')
             print(f"Saved best model of Fold-{fold} with validation accuracy: {best_val_acc:.4f}")
     
     return history, all_preds_np, all_labels_np

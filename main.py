@@ -41,20 +41,40 @@ def seed_worker(worker_id):
 g = torch.Generator()
 g.manual_seed(42)
 
-device = torch.device("cpu")
+def get_device():
+    device = torch.device("cpu")
+    num_gpus = 0
 
-if torch.backends.mps.is_available():
-    device = torch.device("mps")
-elif torch.cuda.is_available():
-    device = torch.device("cuda")
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        num_gpus = torch.cuda.device_count()
+        print(f"CUDA available with {num_gpus} GPU(s)")
+        
+        # Enable tensor core optimization for supported GPUs
+        if num_gpus > 0:
+            gpu_name = torch.cuda.get_device_name(0)
+            if "A100" in gpu_name or "V100" in gpu_name or "RTX" in gpu_name or "T4" in gpu_name:
+                torch.backends.cudnn.allow_tf32 = True
+                torch.backends.cuda.matmul.allow_tf32 = True
+                print(f"Tensor core optimization enabled for {gpu_name}")
+            
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+        print("Using Apple Metal Performance Shaders (MPS)")
 
-print(f"Using device: {device}")
+    print(f"Using device: {device}")
+    if num_gpus > 1:
+        print(f"Multi-GPU training will be enabled with {num_gpus} GPUs")
+    return device, num_gpus
+
 
 def main():
     import torch.multiprocessing
     torch.multiprocessing.set_start_method('spawn', force=True)  # Optional: if explicitly needed
 
     from datasets.examine import folds_df
+
+    device, num_gpus = get_device()
 
     # Create datasets
     train_transform = get_transforms('train', img_size=224)
@@ -63,6 +83,11 @@ def main():
 
     models = get_all_backbones()
     model = models['our_model'].to(device)
+    
+    # Enable multi-GPU training if available
+    if num_gpus > 1:
+        model = torch.nn.DataParallel(model)
+        print(f"Model wrapped with DataParallel for {num_gpus} GPUs")
 
     seed_everything(42)
 
@@ -103,10 +128,16 @@ def main():
             transform=val_transform
         )
 
-        train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=4,
+        # Scale batch size with number of GPUs
+        base_batch_size = 8
+        effective_batch_size = base_batch_size * max(1, num_gpus)
+        
+        train_loader = DataLoader(train_dataset, batch_size=effective_batch_size, shuffle=True, num_workers=4,
                                 worker_init_fn=seed_worker, generator=g, pin_memory=True)
-        val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False, num_workers=4,
+        val_loader = DataLoader(val_dataset, batch_size=effective_batch_size, shuffle=False, num_workers=4,
                                 worker_init_fn=seed_worker, generator=g, pin_memory=True)
+        
+        print(f"Using batch size: {effective_batch_size} (base: {base_batch_size} x {max(1, num_gpus)} GPUs)")
 
         print("Starting training...")
         history, val_preds, val_labels = train_model(
@@ -135,8 +166,13 @@ def main():
         cm = confusion_matrix(val_labels, val_preds)
         all_cms.append(cm)
 
-        # Load best model
-        model.load_state_dict(torch.load(f'output/best_model_fold_{fold}.pth'))
+        # Load best model - handle DataParallel wrapper
+        checkpoint = torch.load(f'output/best_model_fold_{fold}.pth')
+        if hasattr(model, 'module'):
+            # Model is wrapped with DataParallel
+            model.module.load_state_dict(checkpoint)
+        else:
+            model.load_state_dict(checkpoint)
         model.eval()
 
         # Grad-CAM visualization
