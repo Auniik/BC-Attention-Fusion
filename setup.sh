@@ -28,7 +28,14 @@ echo "   (Skipping PyTorch reinstallation to save time)"
 
 # Fix NumPy compatibility with PyTorch 2.1.0
 echo "🔧 Fixing NumPy compatibility..."
-pip install "numpy<2.0.0" --force-reinstall
+echo "Current NumPy version:"
+python -c "import numpy; print(f'NumPy: {numpy.__version__}')" 2>/dev/null || echo "NumPy import failed"
+echo "Downgrading to NumPy 1.x for PyTorch 2.1.0 compatibility..."
+pip install "numpy==1.24.3" --force-reinstall --no-deps
+
+# Verify NumPy downgrade worked
+echo "Verifying NumPy downgrade:"
+python -c "import numpy; print(f'✅ NumPy: {numpy.__version__}')" || echo "❌ NumPy still has issues"
 
 # Install only missing dependencies
 echo "📚 Installing additional project dependencies..."

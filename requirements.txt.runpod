@@ -3,7 +3,7 @@
 
 # SKIP torch, torchvision - already in base container (PyTorch 2.1.0 + CUDA 11.8)
 # CRITICAL: Force NumPy 1.x compatibility with PyTorch 2.1.0
-numpy<2.0.0
+numpy==1.24.3
 # SKIP pillow - already in base container
 
 # Core ML libraries that need installation
