@@ -85,7 +85,7 @@ TRAINING_CONFIG = {
     'warmup_epochs': 3,
     'patience': 8,
     'samples_per_patient_train': 16,
-    'samples_per_patient_val': 4,
+    'samples_per_patient_val': 8,  # Increased for more robust evaluation
     'magnifications': [40, 100, 200, 400],
     'img_size': 224,
     'seed': 42

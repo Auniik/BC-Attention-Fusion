@@ -132,7 +132,8 @@ def main():
             mode='test',
             mags=TRAINING_CONFIG['magnifications'],
             samples_per_patient=TRAINING_CONFIG['samples_per_patient_val'],
-            transform=val_transform
+            transform=val_transform,
+            balance_classes=True  # Add class balancing to validation for fair evaluation
         )
 
         # Use device-specific configuration

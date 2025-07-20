@@ -88,8 +88,9 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
 
     class_weights, tumor_weights = get_loss_weights(fold_df, device)
     
-    # Enhanced loss functions - Label smoothing for better generalization
-    criterion_class = nn.CrossEntropyLoss(weight=class_weights, label_smoothing=0.1)
+    # Enhanced loss functions - Focal loss for class imbalance + label smoothing
+    # Use Focal loss for classification (better for imbalanced data)
+    criterion_class = FocalLoss(alpha=2.0, gamma=2.0)  # Focal loss for main task
     criterion_tumor = nn.CrossEntropyLoss(weight=tumor_weights, label_smoothing=0.05)
     
     # Optimizer with reduced learning rate and better weight decay
@@ -99,16 +100,18 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
     warmup_epochs = 3
     scheduler = get_warmup_scheduler(optimizer, warmup_epochs, num_epochs)
     
-    # Early stopping parameters
-    best_balanced_acc = 0.0
+    # Early stopping parameters - using standard accuracy for realistic evaluation
+    best_val_acc = 0.0
+    best_balanced_acc = 0.0  # Keep for tracking but don't use for early stopping
     patience = 8
     patience_counter = 0
     
     
-    # Training history with additional metrics
+    # Training history with enhanced per-class tracking
     history = {
         'train_loss': [], 'train_acc': [], 'train_f1': [], 'train_balanced_acc': [],
         'val_loss': [], 'val_acc': [], 'val_f1': [], 'val_balanced_acc': [], 'val_tumor_acc': [],
+        'val_benign_acc': [], 'val_malignant_acc': [],  # Per-class accuracy tracking
         'learning_rate': []
     }
     
@@ -230,7 +233,7 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
         # Update learning rate
         scheduler.step()
         
-        # Save history
+        # Save history with per-class tracking
         history['train_loss'].append(train_loss)
         history['train_acc'].append(train_acc)
         history['train_f1'].append(train_f1)
@@ -240,32 +243,43 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
         history['val_f1'].append(val_f1)
         history['val_balanced_acc'].append(val_balanced_acc)
         history['val_tumor_acc'].append(tumor_acc)
+        history['val_benign_acc'].append(benign_acc)
+        history['val_malignant_acc'].append(malignant_acc)
         history['learning_rate'].append(current_lr)
         
-        # Print results
+        # Print results with both metrics for comparison
         print(f"Train - Loss: {train_loss:.4f}, Acc: {train_acc:.4f}, F1: {train_f1:.4f}, Bal_Acc: {train_balanced_acc:.4f}")
         print(f"Val - Loss: {val_loss:.4f}, Acc: {val_acc:.4f}, F1: {val_f1:.4f}, Bal_Acc: {val_balanced_acc:.4f}")
-        print(f"Detailed Bal_Acc: {balanced_acc:.4f} (B: {benign_acc:.4f}, M: {malignant_acc:.4f})")
+        print(f"Per-class Acc: (B: {benign_acc:.4f}, M: {malignant_acc:.4f})")
         print(f"Tumor Acc: {tumor_acc:.4f}, LR: {current_lr:.2e}")
         
-        # Early stopping based on balanced accuracy
-        if val_balanced_acc > best_balanced_acc:
-            best_balanced_acc = val_balanced_acc
+        # Early stopping with per-class minimum requirements (both classes must perform well)
+        min_class_acc = min(benign_acc, malignant_acc)
+        is_improvement = (val_acc > best_val_acc) and (min_class_acc >= 0.85)  # Both classes >= 85%
+        
+        if is_improvement:
+            best_val_acc = val_acc
+            best_balanced_acc = val_balanced_acc  # Update for tracking
             patience_counter = 0
             
             # Save best model - handle DataParallel wrapper
             if hasattr(model, 'module'):
-                torch.save(model.module.state_dict(), f'output/best_model_fold_{fold}.pth')
+                torch.save(model.module.state_dict(), f'output/best_model_fold_{fold}.pth', weights_only=True)
             else:
-                torch.save(model.state_dict(), f'output/best_model_fold_{fold}.pth')
-            print(f"🎯 New best balanced accuracy: {best_balanced_acc:.4f} - Model saved!")
+                torch.save(model.state_dict(), f'output/best_model_fold_{fold}.pth', weights_only=True)
+            print(f"🎯 New best accuracy: {best_val_acc:.4f} (Bal: {best_balanced_acc:.4f}) - Model saved!")
+            print(f"   Per-class performance: B={benign_acc:.4f}, M={malignant_acc:.4f} ✅")
         else:
             patience_counter += 1
-            print(f"No improvement for {patience_counter}/{patience} epochs")
+            if min_class_acc < 0.85:
+                print(f"No improvement - Per-class requirement not met (min: {min_class_acc:.4f} < 0.85)")
+            else:
+                print(f"No improvement for {patience_counter}/{patience} epochs")
             
         # Early stopping check
         if patience_counter >= patience:
             print(f"\n⏹️ Early stopping triggered after {epoch+1} epochs")
+            print(f"Best standard accuracy: {best_val_acc:.4f}")
             print(f"Best balanced accuracy: {best_balanced_acc:.4f}")
             break
     
