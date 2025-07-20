@@ -9,12 +9,6 @@ from sklearn.utils.class_weight import compute_class_weight
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-try:
-    from torch.amp import autocast
-    from torch.cuda.amp import GradScaler
-except ImportError:
-    # Fallback for older PyTorch versions
-    from torch.cuda.amp import autocast, GradScaler
 
 
 def get_loss_weights(fold_df, device):
@@ -71,11 +65,6 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
     # Learning rate scheduler
     scheduler = CosineAnnealingLR(optimizer, T_max=num_epochs, eta_min=1e-6)
     
-    # Mixed precision training for tensor cores
-    use_amp = device.type == 'cuda' and torch.cuda.is_available()
-    scaler = GradScaler() if use_amp else None
-    if use_amp:
-        print("Using Automatic Mixed Precision (AMP) for tensor core optimization")
     
     # Training history
     history = {
@@ -85,6 +74,10 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
     
     best_val_acc = 0.0
     balanced_acc = 0.0
+    
+    # Initialize variables for final return
+    all_preds_np = np.array([])
+    all_labels_np = np.array([])
     
     for epoch in range(num_epochs):
         print(f"\nEpoch {epoch+1}/{num_epochs}")
@@ -105,36 +98,19 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
             
             optimizer.zero_grad()
             
-            # Forward pass with mixed precision
-            if use_amp:
-                with autocast('cuda'):
-                    class_logits, tumor_logits = model(images_dict)
-                    
-                    # Calculate losses
-                    loss_class = criterion_class(class_logits, class_labels)
-                    loss_tumor = criterion_tumor(tumor_logits, tumor_labels)
-                    
-                    # Combined loss
-                    loss = 0.9 * loss_class + 0.1 * loss_tumor
-                
-                # Backward pass with gradient scaling
-                scaler.scale(loss).backward()
-                scaler.step(optimizer)
-                scaler.update()
-            else:
-                # Standard forward pass
-                class_logits, tumor_logits = model(images_dict)
-                
-                # Calculate losses
-                loss_class = criterion_class(class_logits, class_labels)
-                loss_tumor = criterion_tumor(tumor_logits, tumor_labels)
-                
-                # Combined loss
-                loss = 0.9 * loss_class + 0.1 * loss_tumor
-                
-                # Backward pass
-                loss.backward()
-                optimizer.step()
+            # Forward pass
+            class_logits, tumor_logits = model(images_dict)
+            
+            # Calculate losses
+            loss_class = criterion_class(class_logits, class_labels)
+            loss_tumor = criterion_tumor(tumor_logits, tumor_labels)
+            
+            # Combined loss
+            loss = 0.9 * loss_class + 0.1 * loss_tumor
+            
+            # Backward pass
+            loss.backward()
+            optimizer.step()
             
             # Statistics - accumulate on GPU to reduce transfers
             running_loss += loss.item()
@@ -167,23 +143,13 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
                 class_labels = batch['class_label'].to(device, non_blocking=True)
                 tumor_labels = batch['tumor_type_label'].to(device, non_blocking=True)
                 
-                # Forward pass with mixed precision
-                if use_amp:
-                    with autocast('cuda'):
-                        class_logits, tumor_logits = model(images_dict)
-                        
-                        # Calculate losses
-                        loss_class = criterion_class(class_logits, class_labels)
-                        loss_tumor = criterion_tumor(tumor_logits, tumor_labels)
-                        loss = 0.7 * loss_class + 0.3 * loss_tumor
-                else:
-                    # Standard forward pass
-                    class_logits, tumor_logits = model(images_dict)
-                    
-                    # Calculate losses
-                    loss_class = criterion_class(class_logits, class_labels)
-                    loss_tumor = criterion_tumor(tumor_logits, tumor_labels)
-                    loss = 0.7 * loss_class + 0.3 * loss_tumor
+                # Forward pass
+                class_logits, tumor_logits = model(images_dict)
+                
+                # Calculate losses
+                loss_class = criterion_class(class_logits, class_labels)
+                loss_tumor = criterion_tumor(tumor_logits, tumor_labels)
+                loss = 0.7 * loss_class + 0.3 * loss_tumor
                 
                 # Statistics - accumulate on GPU
                 running_loss += loss.item()
