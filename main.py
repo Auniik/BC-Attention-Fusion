@@ -10,7 +10,7 @@ from gradcam import plot_and_save_gradcam
 from datasets.multi_mag import MultiMagnificationDataset
 from plotting import plot_all_fold_confusion_matrices, plot_cross_magnification_fusion, plot_training_metrics, print_cross_fold_summary, print_fold_metrics
 from train import train_model
-from datasets.preprocess import create_multi_mag_dataset_info
+from datasets.preprocess import create_multi_mag_dataset_info, get_patients_for_mode
 from config import get_training_config, TRAINING_CONFIG
 
 from utils.transforms import get_transforms
@@ -116,8 +116,11 @@ def main():
         multi_mag_patients, single_mag_patients, fold_df, fold_statistics = create_multi_mag_dataset_info(folds_df, fold=fold)
         all_fold_statistics.append(fold_statistics)
 
+        # Filter patients for proper cross-validation
+        train_patients = get_patients_for_mode(multi_mag_patients, fold_df, mode='train')
+        
         train_dataset = MultiMagnificationDataset(
-            multi_mag_patients, 
+            train_patients, 
             fold_df,
             mode='train',
             mags=TRAINING_CONFIG['magnifications'],
@@ -126,8 +129,11 @@ def main():
             balance_classes=True  # Enable balancing
         )
 
+        # Filter patients for proper cross-validation
+        test_patients = get_patients_for_mode(multi_mag_patients, fold_df, mode='test')
+        
         val_dataset = MultiMagnificationDataset(
-            multi_mag_patients,
+            test_patients,
             fold_df,
             mode='test',
             mags=TRAINING_CONFIG['magnifications'],

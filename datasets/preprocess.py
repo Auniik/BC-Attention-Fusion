@@ -50,6 +50,34 @@ def create_multi_mag_dataset_info(df, fold=1, plot_distribution=False):
 
     return multi_mag_patients, single_mag_patients, fold_df, fold_statistics
 
+def get_patients_for_mode(multi_mag_patients, fold_df, mode='train'):
+    """Filter patients based on the mode (train/test) for proper cross-validation"""
+    
+    # Get patient IDs that have samples in the specified mode
+    mode_patient_ids = set(fold_df[fold_df['grp'] == mode]['patient_id'].unique())
+    
+    # Filter multi_mag_patients to only include patients for this mode
+    mode_patients = [
+        patient for patient in multi_mag_patients 
+        if patient['patient_id'] in mode_patient_ids
+    ]
+    
+    print(f"🔍 Mode '{mode}' filtering:")
+    print(f"   Total available patients: {len(multi_mag_patients)}")
+    print(f"   Patients with {mode} samples: {len(mode_patient_ids)}")
+    print(f"   Filtered patients for {mode}: {len(mode_patients)}")
+    
+    # Verify no overlap in cross-validation
+    if mode == 'train':
+        test_patient_ids = set(fold_df[fold_df['grp'] == 'test']['patient_id'].unique())
+        overlap = mode_patient_ids & test_patient_ids
+        if len(overlap) > 0:
+            print(f"   ⚠️  WARNING: {len(overlap)} patients overlap between train and test!")
+        else:
+            print(f"   ✅ No patient overlap between train and test")
+    
+    return mode_patients
+
 
 
 import pandas as pd

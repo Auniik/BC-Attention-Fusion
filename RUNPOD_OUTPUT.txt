@@ -1,3 +1,115 @@
+🚀 RUNPOD SETUP FOR BREAST CANCER CLASSIFICATION
+============================================================
+🔍 CHECKING ENVIRONMENT
+==================================================
+📊 Environment: runpod
+📂 Base path: /workspace
+🎯 Dataset path: /workspace/breakhis
+📄 Folds file: /workspace/breakhis/Folds_fixed.csv
+
+🔍 CHECKING DATASET AVAILABILITY
+==================================================
+✅ Dataset found at: /workspace/breakhis
+✅ Original folds: /workspace/breakhis/Folds.csv
+✅ Images directory: /workspace/breakhis/BreaKHis_v1
+
+🔍 CHECKING CROSS-VALIDATION FIX
+==================================================
+❌ Fixed folds file not found: /workspace/breakhis/Folds_fixed.csv
+
+🔧 Cross-validation fix needed, applying now...
+
+🔧 APPLYING CROSS-VALIDATION FIX
+==================================================
+✅ Cross-validation fix applied successfully!
+📄 Output:
+🔧 Environment detected: runpod
+📂 Base path: /workspace
+📄 Input: /workspace/breakhis/Folds.csv
+📄 Output: /workspace/breakhis/Folds_fixed.csv
+Original data shape: (39545, 4)
+
+Total unique patients: 82
+Class distribution:
+tumor_class
+malignant    58
+benign       24
+Name: count, dtype: int64
+
+Tumor type distribution:
+tumor_type
+ductal_carcinoma       38
+fibroadenoma           10
+mucinous_carcinoma      9
+tubular_adenoma         7
+papillary_carcinoma     6
+lobular_carcinoma       5
+adenosis                4
+phyllodes_tumor         3
+Name: count, dtype: int64
+
+Patients per fold:
+Fold 1: 17 patients
+  - Benign: 5
+  - Malignant: 12
+Fold 2: 17 patients
+  - Benign: 5
+  - Malignant: 12
+Fold 3: 16 patients
+  - Benign: 5
+  - Malignant: 11
+Fold 4: 16 patients
+  - Benign: 5
+  - Malignant: 11
+Fold 5: 16 patients
+  - Benign: 4
+  - Malignant: 12
+
+=== VERIFICATION ===
+Fold 1:
+  Train: 65 patients, 30885 samples
+  Test: 17 patients, 8660 samples
+  Patient overlap: 0 (should be 0)
+Fold 2:
+  Train: 65 patients, 32420 samples
+  Test: 17 patients, 7125 samples
+  Patient overlap: 0 (should be 0)
+Fold 3:
+  Train: 66 patients, 30735 samples
+  Test: 16 patients, 8810 samples
+  Patient overlap: 0 (should be 0)
+Fold 4:
+  Train: 66 patients, 31600 samples
+  Test: 16 patients, 7945 samples
+  Patient overlap: 0 (should be 0)
+Fold 5:
+  Train: 66 patients, 32540 samples
+  Test: 16 patients, 7005 samples
+  Patient overlap: 0 (should be 0)
+
+✅ Fixed cross-validation folds saved to: /workspace/breakhis/Folds_fixed.csv
+Original shape: (39545, 7), Fixed shape: (197725, 4)
+
+🎯 Cross-validation data leakage has been FIXED!
+📊 Environment: runpod
+📄 Fixed folds saved to: /workspace/breakhis/Folds_fixed.csv
+✅ Ready for training with proper cross-validation!
+
+
+🧪 VALIDATING CROSS-VALIDATION FIX
+==================================================
+✅ Cross-validation fix validation PASSED!
+
+🎉 RUNPOD SETUP COMPLETED SUCCESSFULLY!
+============================================================
+📊 Environment: runpod
+✅ Dataset: Available and verified
+✅ Cross-validation: Fixed and validated
+🚀 Ready to run: python main.py
+🎯 Expected results: Realistic 90-96% ensemble accuracy (not 100%)
+
+✅ Setup successful. You can now run the training!
+root@67a1fc13efd9:/workspace/BC-Attention-Fusion# python main.py
 Dataset Statistics:
 --------------------------------------------------------------------------------
 Category                                 Images     Patients
@@ -36,7 +148,7 @@ malignant_papillary_carcinoma_400X       138        6
 malignant_papillary_carcinoma_40X        145        6
 
 Folds.csv Info:
-Shape: (39545, 4)
+Shape: (197725, 4)
 
 Columns: ['fold', 'mag', 'grp', 'filename']
 
@@ -50,53 +162,53 @@ First few rows:
 
 Fold distribution:
 fold
-1    7909
-2    7909
-3    7909
-4    7909
-5    7909
+1    39545
+2    39545
+3    39545
+4    39545
+5    39545
 Name: count, dtype: int64
 
 Magnification distribution:
 mag
-100    10405
-200    10065
-40      9975
-400     9100
+100    52025
+200    50325
+40     49875
+400    45500
 Name: count, dtype: int64
 
 Train/Test distribution:
 grp
-train    25880
-test     13665
+train    158180
+test      39545
 Name: count, dtype: int64
-       fold  mag    grp                                           filename
-0         1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
-1         1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
-2         1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
-3         1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
-4         1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
-...     ...  ...    ...                                                ...
-39540     5  400   test  BreaKHis_v1/histology_slides/breast/malignant/...
-39541     5  400   test  BreaKHis_v1/histology_slides/breast/malignant/...
-39542     5  400   test  BreaKHis_v1/histology_slides/breast/malignant/...
-39543     5  400   test  BreaKHis_v1/histology_slides/breast/malignant/...
-39544     5  400   test  BreaKHis_v1/histology_slides/breast/malignant/...
+        fold  mag    grp                                           filename
+0          1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
+1          1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
+2          1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
+3          1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
+4          1  100  train  BreaKHis_v1/histology_slides/breast/benign/SOB...
+...      ...  ...    ...                                                ...
+197720     5  400  train  BreaKHis_v1/histology_slides/breast/malignant/...
+197721     5  400  train  BreaKHis_v1/histology_slides/breast/malignant/...
+197722     5  400  train  BreaKHis_v1/histology_slides/breast/malignant/...
+197723     5  400  train  BreaKHis_v1/histology_slides/breast/malignant/...
+197724     5  400  train  BreaKHis_v1/histology_slides/breast/malignant/...
 
-[39545 rows x 4 columns]
+[197725 rows x 4 columns]
 Dataset structure analysis:
 Unique patients: 82
 
 Tumor types distribution:
 tumor_class  tumor_type
-benign       adenosis                2220
-             fibroadenoma            5070
-             phyllodes_tumor         2265
-             tubular_adenoma         2845
-malignant    ductal_carcinoma       17255
-             lobular_carcinoma       3130
-             mucinous_carcinoma      3960
-             papillary_carcinoma     2800
+benign       adenosis               11100
+             fibroadenoma           25350
+             phyllodes_tumor        11325
+             tubular_adenoma        14225
+malignant    ductal_carcinoma       86275
+             lobular_carcinoma      15650
+             mucinous_carcinoma     19800
+             papillary_carcinoma    14000
 dtype: int64
 
 Patients by number of magnifications available:
@@ -106,26 +218,26 @@ Name: count, dtype: int64
 
 Images per patient-magnification (sample):
 patient_id          magnification
-SOB_B_A_14-22549AB  40               145
-                    100              150
-                    200              160
-                    400              150
-SOB_B_A_14-22549CD  40               175
-                    100              180
-                    200              155
-                    400              150
-SOB_B_A_14-22549G   40               175
-                    100              170
-                    200              160
-                    400              145
-SOB_B_A_14-29960CD  40                75
-                    100               65
-                    200               80
-                    400               85
-SOB_B_F_14-14134    40               180
-                    100              155
-                    200              190
-                    400              185
+SOB_B_A_14-22549AB  40               725
+                    100              750
+                    200              800
+                    400              750
+SOB_B_A_14-22549CD  40               875
+                    100              900
+                    200              775
+                    400              750
+SOB_B_A_14-22549G   40               875
+                    100              850
+                    200              800
+                    400              725
+SOB_B_A_14-29960CD  40               375
+                    100              325
+                    200              400
+                    400              425
+SOB_B_F_14-14134    40               900
+                    100              775
+                    200              950
+                    400              925
 dtype: int64
 
 ============================================================
@@ -136,61 +248,61 @@ FOLD 1 ANALYSIS
 Class distribution by split:
 tumor_class  benign  malignant
 grp
-test           1008       1896
-train          1472       3533
+test           3400       5260
+train          9000      21885
 
-Class ratio (benign:malignant) in train: 1472:3533
+Class ratio (benign:malignant) in train: 9000:21885
 
 === TUMOR TYPE DISTRIBUTION ===
 tumor_class  tumor_type
-benign       adenosis                253
-             fibroadenoma            683
-             phyllodes_tumor         218
-             tubular_adenoma         318
-malignant    ductal_carcinoma       2313
-             lobular_carcinoma       302
-             mucinous_carcinoma      547
-             papillary_carcinoma     371
+benign       adenosis                1570
+             fibroadenoma            3495
+             phyllodes_tumor         1090
+             tubular_adenoma         2845
+malignant    ductal_carcinoma       14375
+             lobular_carcinoma       1990
+             mucinous_carcinoma      3045
+             papillary_carcinoma     2475
 dtype: int64
 
 === PATIENT-LEVEL ANALYSIS ===
 Unique patients - Benign: 24, Malignant: 58
 
 Images per patient stats:
-Mean: 92.7, Std: 34.9
+Mean: 475.2, Std: 179.0
 
 === MAGNIFICATION BALANCE ===
-mag          40   100  200  400
+mag           40    100   200   400
 tumor_class
-benign       370  383  368  351
-malignant    880  938  901  814
+benign       2290  2295  2275  2140
+malignant    5580  5750  5630  4925
 
 === CALCULATED WEIGHTS ===
-Class weights: {'malignant': 0.7083215397679027, 'benign': 1.7000679347826086}
+Class weights: {'malignant': 0.705620287868403, 'benign': 1.7158333333333333}
 
 Tumor type weights (top 5):
-  phyllodes_tumor: 2.870
-  adenosis: 2.473
-  lobular_carcinoma: 2.072
-  tubular_adenoma: 1.967
-  papillary_carcinoma: 1.686
+  phyllodes_tumor: 3.542
+  adenosis: 2.459
+  lobular_carcinoma: 1.940
+  papillary_carcinoma: 1.560
+  tubular_adenoma: 1.357
 🔧 Environment detected: runpod
 🎯 Device: cuda
 🚀 CUDA available with 1 GPU(s)
-⚡ Tensor core optimization enabled for NVIDIA GeForce RTX 4090
+⚡ Tensor core optimization enabled for NVIDIA RTX 4000 Ada Generation
 📊 Batch size: 16 | Workers: 8
-model.safetensors: 100%|------| 36.8M/36.8M [00:00<00:00, 115MB/s]
+model.safetensors: 100%|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------██| 36.8M/36.8M [00:00<00:00, 49.7MB/s]
 ==== Fold 1 ====
-Balanced dataset: 624 benign, 624 malignant
+Balanced dataset: 736 benign, 736 malignant
 Dataset initialized:
   Mode: train
   Patients: 82
-  Samples per epoch: 1248
+  Samples per epoch: 1472
   Magnifications: [40, 100, 200, 400]
 Dataset initialized:
   Mode: test
   Patients: 82
-  Samples per epoch: 224
+  Samples per epoch: 136
   Magnifications: [40, 100, 200, 400]
 📈 Using batch size: 16 | Workers: 8 | Environment: runpod
 Starting training...
@@ -199,934 +311,785 @@ Early stopping patience: 8 epochs
 
 Epoch 1/25
 --------------------------------------------------
-Training: 100%|------| 78/78 [00:29<00:00,  2.62it/s, loss=0.4919]
-Validating: 100%|------------| 14/14 [00:19<00:00,  1.38s/it]
-Train - Loss: 0.6923, Acc: 0.5216, F1: 0.5199, Bal_Acc: 0.5216
-Val - Loss: 0.9075, Acc: 0.5179, F1: 0.5141, Bal_Acc: 0.4401
-Per-class Acc: (B: 0.2222, M: 0.6579)
-Tumor Acc: 0.1339, LR: 0.00e+00
-No improvement - Per-class requirement not met (min: 0.2222 < 0.85)
+Training: 100%|--------| 92/92 [00:59<00:00,  1.53it/s, loss=0.5761]
+Validating: 100%|----------------| 9/9 [00:37<00:00,  4.16s/it]
+Train - Loss: 0.6544, Acc: 0.5000, F1: 0.4988, Bal_Acc: 0.5000
+Val - Loss: 0.9037, Acc: 0.5147, F1: 0.5069, Bal_Acc: 0.4010
+Per-class Acc: (B: 0.1250, M: 0.6771)
+Tumor Acc: 0.2132, LR: 0.00e+00
+No improvement - Per-class requirement not met (min: 0.1250 < 0.85)
 
 Epoch 2/25
 --------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  7.93it/s, loss=0.3467]
-Validating: 100%|------------| 14/14 [00:01<00:00,  9.08it/s]
-Train - Loss: 0.4031, Acc: 0.8077, F1: 0.8075, Bal_Acc: 0.8077
-Val - Loss: 0.6154, Acc: 0.9241, F1: 0.9237, Bal_Acc: 0.9075
-Per-class Acc: (B: 0.8611, M: 0.9539)
-Tumor Acc: 0.5848, LR: 1.67e-04
-🎯 New best accuracy: 0.9241 (Bal: 0.9075) - Model saved!
-   Per-class performance: B=0.8611, M=0.9539 ✅
+Training: 100%|--------| 92/92 [00:22<00:00,  4.14it/s, loss=0.2300]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  4.95it/s]
+Train - Loss: 0.3818, Acc: 0.8302, F1: 0.8300, Bal_Acc: 0.8302
+Val - Loss: 0.6584, Acc: 0.8971, F1: 0.8995, Bal_Acc: 0.9052
+Per-class Acc: (B: 0.9250, M: 0.8854)
+Tumor Acc: 0.5809, LR: 1.67e-04
+🎯 New best accuracy: 0.8971 (Bal: 0.9052) - Model saved!
+   Per-class performance: B=0.9250, M=0.8854 ✅
 
 Epoch 3/25
 --------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  7.83it/s, loss=0.1478]
-Validating: 100%|------------| 14/14 [00:01<00:00,  9.15it/s]
-Train - Loss: 0.2495, Acc: 0.9175, F1: 0.9175, Bal_Acc: 0.9175
-Val - Loss: 0.5419, Acc: 0.9286, F1: 0.9280, Bal_Acc: 0.9108
-Per-class Acc: (B: 0.8611, M: 0.9605)
-Tumor Acc: 0.6116, LR: 3.33e-04
-🎯 New best accuracy: 0.9286 (Bal: 0.9108) - Model saved!
-   Per-class performance: B=0.8611, M=0.9605 ✅
+Training: 100%|--------| 92/92 [00:22<00:00,  4.14it/s, loss=0.2353]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  4.81it/s]
+Train - Loss: 0.2164, Acc: 0.9477, F1: 0.9477, Bal_Acc: 0.9477
+Val - Loss: 0.5826, Acc: 0.9191, F1: 0.9188, Bal_Acc: 0.8990
+Per-class Acc: (B: 0.8500, M: 0.9479)
+Tumor Acc: 0.5588, LR: 3.33e-04
+🎯 New best accuracy: 0.9191 (Bal: 0.8990) - Model saved!
+   Per-class performance: B=0.8500, M=0.9479 ✅
 
 Epoch 4/25
 --------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.22it/s, loss=0.2589]
-Validating: 100%|------------| 14/14 [00:01<00:00,  9.77it/s]
-Train - Loss: 0.2191, Acc: 0.9319, F1: 0.9319, Bal_Acc: 0.9319
-Val - Loss: 0.5613, Acc: 0.8929, F1: 0.8875, Bal_Acc: 0.8406
-Per-class Acc: (B: 0.6944, M: 0.9868)
-Tumor Acc: 0.5938, LR: 5.00e-04
-No improvement - Per-class requirement not met (min: 0.6944 < 0.85)
+Training: 100%|--------| 92/92 [00:22<00:00,  4.11it/s, loss=0.2151]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  5.05it/s]
+Train - Loss: 0.1885, Acc: 0.9436, F1: 0.9436, Bal_Acc: 0.9436
+Val - Loss: 0.6448, Acc: 0.8897, F1: 0.8915, Bal_Acc: 0.8854
+Per-class Acc: (B: 0.8750, M: 0.8958)
+Tumor Acc: 0.5515, LR: 5.00e-04
+No improvement for 1/8 epochs
 
 Epoch 5/25
 --------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.32it/s, loss=0.2693]
-Validating: 100%|------------| 14/14 [00:01<00:00,  9.72it/s]
-Train - Loss: 0.1440, Acc: 0.9800, F1: 0.9800, Bal_Acc: 0.9800
-Val - Loss: 0.5362, Acc: 0.9196, F1: 0.9190, Bal_Acc: 0.9006
-Per-class Acc: (B: 0.8472, M: 0.9539)
-Tumor Acc: 0.5938, LR: 4.97e-04
-No improvement - Per-class requirement not met (min: 0.8472 < 0.85)
+Training: 100%|--------| 92/92 [00:22<00:00,  4.12it/s, loss=0.1227]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  5.11it/s]
+Train - Loss: 0.1792, Acc: 0.9531, F1: 0.9531, Bal_Acc: 0.9531
+Val - Loss: 0.5984, Acc: 0.8824, F1: 0.8739, Bal_Acc: 0.8073
+Per-class Acc: (B: 0.6250, M: 0.9896)
+Tumor Acc: 0.5588, LR: 4.97e-04
+No improvement - Per-class requirement not met (min: 0.6250 < 0.85)
 
 Epoch 6/25
 --------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.09it/s, loss=0.1911]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.06it/s]
-Train - Loss: 0.1544, Acc: 0.9599, F1: 0.9599, Bal_Acc: 0.9599
-Val - Loss: 0.5191, Acc: 0.9196, F1: 0.9211, Bal_Acc: 0.9298
-Per-class Acc: (B: 0.9583, M: 0.9013)
-Tumor Acc: 0.5670, LR: 4.90e-04
-No improvement for 3/8 epochs
+Training: 100%|--------| 92/92 [00:21<00:00,  4.20it/s, loss=0.1066]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  5.20it/s]
+Train - Loss: 0.1313, Acc: 0.9688, F1: 0.9687, Bal_Acc: 0.9688
+Val - Loss: 0.6185, Acc: 0.8750, F1: 0.8763, Bal_Acc: 0.8604
+Per-class Acc: (B: 0.8250, M: 0.8958)
+Tumor Acc: 0.5809, LR: 4.90e-04
+No improvement - Per-class requirement not met (min: 0.8250 < 0.85)
 
 Epoch 7/25
 --------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  7.89it/s, loss=0.0926]
-Validating: 100%|------------| 14/14 [00:01<00:00,  9.71it/s]
-Train - Loss: 0.1387, Acc: 0.9607, F1: 0.9607, Bal_Acc: 0.9607
-Val - Loss: 0.4892, Acc: 0.9598, F1: 0.9602, Bal_Acc: 0.9631
-Per-class Acc: (B: 0.9722, M: 0.9539)
-Tumor Acc: 0.5580, LR: 4.77e-04
-🎯 New best accuracy: 0.9598 (Bal: 0.9631) - Model saved!
-   Per-class performance: B=0.9722, M=0.9539 ✅
+Training: 100%|--------| 92/92 [00:22<00:00,  4.13it/s, loss=0.1056]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  5.31it/s]
+Train - Loss: 0.1329, Acc: 0.9640, F1: 0.9640, Bal_Acc: 0.9640
+Val - Loss: 0.5986, Acc: 0.9191, F1: 0.9199, Bal_Acc: 0.9135
+Per-class Acc: (B: 0.9000, M: 0.9271)
+Tumor Acc: 0.6324, LR: 4.77e-04
+No improvement for 4/8 epochs
 
 Epoch 8/25
 --------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.11it/s, loss=0.1220]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.21it/s]
-Train - Loss: 0.1269, Acc: 0.9736, F1: 0.9736, Bal_Acc: 0.9736
-Val - Loss: 0.5198, Acc: 0.9509, F1: 0.9516, Bal_Acc: 0.9602
-Per-class Acc: (B: 0.9861, M: 0.9342)
-Tumor Acc: 0.4911, LR: 4.60e-04
-No improvement for 1/8 epochs
+Training: 100%|--------| 92/92 [00:22<00:00,  4.11it/s, loss=0.0833]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  5.34it/s]
+Train - Loss: 0.1049, Acc: 0.9823, F1: 0.9823, Bal_Acc: 0.9823
+Val - Loss: 0.5771, Acc: 0.8824, F1: 0.8794, Bal_Acc: 0.8365
+Per-class Acc: (B: 0.7250, M: 0.9479)
+Tumor Acc: 0.5956, LR: 4.60e-04
+No improvement - Per-class requirement not met (min: 0.7250 < 0.85)
 
 Epoch 9/25
 --------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.00it/s, loss=0.1209]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.26it/s]
-Train - Loss: 0.1240, Acc: 0.9688, F1: 0.9687, Bal_Acc: 0.9688
-Val - Loss: 0.5387, Acc: 0.8839, F1: 0.8757, Bal_Acc: 0.8194
-Per-class Acc: (B: 0.6389, M: 1.0000)
-Tumor Acc: 0.5312, LR: 4.39e-04
-No improvement - Per-class requirement not met (min: 0.6389 < 0.85)
+Training: 100%|--------| 92/92 [00:22<00:00,  4.13it/s, loss=0.1345]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  5.24it/s]
+Train - Loss: 0.1112, Acc: 0.9810, F1: 0.9810, Bal_Acc: 0.9810
+Val - Loss: 0.6851, Acc: 0.8603, F1: 0.8608, Bal_Acc: 0.8354
+Per-class Acc: (B: 0.7750, M: 0.8958)
+Tumor Acc: 0.5588, LR: 4.39e-04
+No improvement - Per-class requirement not met (min: 0.7750 < 0.85)
 
 Epoch 10/25
 --------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  7.90it/s, loss=0.1424]
-Validating: 100%|------------| 14/14 [00:01<00:00,  8.88it/s]
-Train - Loss: 0.0898, Acc: 0.9928, F1: 0.9928, Bal_Acc: 0.9928
-Val - Loss: 0.4690, Acc: 0.9643, F1: 0.9640, Bal_Acc: 0.9518
-Per-class Acc: (B: 0.9167, M: 0.9868)
-Tumor Acc: 0.5714, LR: 4.14e-04
-🎯 New best accuracy: 0.9643 (Bal: 0.9518) - Model saved!
-   Per-class performance: B=0.9167, M=0.9868 ✅
+Training: 100%|--------| 92/92 [00:22<00:00,  4.15it/s, loss=0.0999]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  5.33it/s]
+Train - Loss: 0.1166, Acc: 0.9674, F1: 0.9674, Bal_Acc: 0.9674
+Val - Loss: 0.5468, Acc: 0.9265, F1: 0.9239, Bal_Acc: 0.8823
+Per-class Acc: (B: 0.7750, M: 0.9896)
+Tumor Acc: 0.6618, LR: 4.14e-04
+No improvement - Per-class requirement not met (min: 0.7750 < 0.85)
 
 Epoch 11/25
 --------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.13it/s, loss=0.1303]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.37it/s]
-Train - Loss: 0.0878, Acc: 0.9904, F1: 0.9904, Bal_Acc: 0.9904
-Val - Loss: 0.4637, Acc: 0.9732, F1: 0.9734, Bal_Acc: 0.9766
-Per-class Acc: (B: 0.9861, M: 0.9671)
-Tumor Acc: 0.5804, LR: 3.85e-04
-🎯 New best accuracy: 0.9732 (Bal: 0.9766) - Model saved!
-   Per-class performance: B=0.9861, M=0.9671 ✅
-
-Epoch 12/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.07it/s, loss=0.0850]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.19it/s]
-Train - Loss: 0.0803, Acc: 0.9944, F1: 0.9944, Bal_Acc: 0.9944
-Val - Loss: 0.4648, Acc: 0.9732, F1: 0.9731, Bal_Acc: 0.9656
-Per-class Acc: (B: 0.9444, M: 0.9868)
-Tumor Acc: 0.5670, LR: 3.54e-04
-No improvement for 1/8 epochs
-
-Epoch 13/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:10<00:00,  7.69it/s, loss=0.1703]
-Validating: 100%|------------| 14/14 [00:01<00:00,  9.98it/s]
-Train - Loss: 0.1122, Acc: 0.9728, F1: 0.9728, Bal_Acc: 0.9728
-Val - Loss: 0.4945, Acc: 0.9420, F1: 0.9423, Bal_Acc: 0.9390
-Per-class Acc: (B: 0.9306, M: 0.9474)
-Tumor Acc: 0.5446, LR: 3.20e-04
-No improvement for 2/8 epochs
-
-Epoch 14/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.03it/s, loss=0.0607]
-Validating: 100%|------------| 14/14 [00:01<00:00,  8.92it/s]
-Train - Loss: 0.0900, Acc: 0.9816, F1: 0.9816, Bal_Acc: 0.9816
-Val - Loss: 0.5191, Acc: 0.9375, F1: 0.9373, Bal_Acc: 0.9247
-Per-class Acc: (B: 0.8889, M: 0.9605)
-Tumor Acc: 0.5223, LR: 2.86e-04
-No improvement for 3/8 epochs
-
-Epoch 15/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  7.92it/s, loss=0.0633]
-Validating: 100%|------------| 14/14 [00:01<00:00,  9.30it/s]
-Train - Loss: 0.0755, Acc: 0.9928, F1: 0.9928, Bal_Acc: 0.9928
-Val - Loss: 0.5063, Acc: 0.9152, F1: 0.9132, Bal_Acc: 0.8827
-Per-class Acc: (B: 0.7917, M: 0.9737)
-Tumor Acc: 0.5402, LR: 2.50e-04
-No improvement - Per-class requirement not met (min: 0.7917 < 0.85)
-
-Epoch 16/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  7.95it/s, loss=0.0453]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.26it/s]
-Train - Loss: 0.0755, Acc: 0.9896, F1: 0.9896, Bal_Acc: 0.9896
-Val - Loss: 0.5116, Acc: 0.9420, F1: 0.9416, Bal_Acc: 0.9280
-Per-class Acc: (B: 0.8889, M: 0.9671)
-Tumor Acc: 0.5402, LR: 2.14e-04
-No improvement for 5/8 epochs
-
-Epoch 17/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.34it/s, loss=0.0514]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.06it/s]
-Train - Loss: 0.0740, Acc: 0.9912, F1: 0.9912, Bal_Acc: 0.9912
-Val - Loss: 0.4675, Acc: 0.9554, F1: 0.9546, Bal_Acc: 0.9342
-Per-class Acc: (B: 0.8750, M: 0.9934)
-Tumor Acc: 0.6250, LR: 1.80e-04
-No improvement for 6/8 epochs
-
-Epoch 18/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.15it/s, loss=0.0513]
-Validating: 100%|------------| 14/14 [00:01<00:00,  9.99it/s]
-Train - Loss: 0.0779, Acc: 0.9872, F1: 0.9872, Bal_Acc: 0.9872
-Val - Loss: 0.4875, Acc: 0.9286, F1: 0.9286, Bal_Acc: 0.9181
-Per-class Acc: (B: 0.8889, M: 0.9474)
-Tumor Acc: 0.5938, LR: 1.46e-04
-No improvement for 7/8 epochs
-
-Epoch 19/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.21it/s, loss=0.1000]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.45it/s]
-Train - Loss: 0.0713, Acc: 0.9896, F1: 0.9896, Bal_Acc: 0.9896
-Val - Loss: 0.4971, Acc: 0.9420, F1: 0.9414, Bal_Acc: 0.9243
-Per-class Acc: (B: 0.8750, M: 0.9737)
-Tumor Acc: 0.6027, LR: 1.15e-04
-No improvement for 8/8 epochs
-
-⏹️ Early stopping triggered after 19 epochs
-Best standard accuracy: 0.9732
-Best balanced accuracy: 0.9766
-
-=== DETAILED CLASSIFICATION REPORT ===
-              precision    recall  f1-score   support
-
-      benign     0.9403    0.8750    0.9065        72
-   malignant     0.9427    0.9737    0.9579       152
-
-    accuracy                         0.9420       224
-   macro avg     0.9415    0.9243    0.9322       224
-weighted avg     0.9419    0.9420    0.9414       224
-
-
-=== CONFUSION MATRIX ===
-Predicted:  benign  malignant
-benign:         63        9
-malignant:       4      148
-
-=== KEY INSIGHTS ===
-Benign Recall: 0.8750 (63/72)
-Malignant Recall: 0.9737 (148/152)
-
-Prediction distribution: benign=67, malignant=157
-Analyzing cross-magnification feature importance...
-
-Final Validation Accuracy: 0.9732
-
-Magnification Importance Analysis:
-40x contribution: 0.0479 ± 0.0684
-100x contribution: 0.0366 ± 0.0777
-200x contribution: 0.0258 ± 0.0752
-400x contribution: 0.0292 ± 0.0614
-==== Fold 2 ====
-Balanced dataset: 624 benign, 624 malignant
-Dataset initialized:
-  Mode: train
-  Patients: 82
-  Samples per epoch: 1248
-  Magnifications: [40, 100, 200, 400]
-Dataset initialized:
-  Mode: test
-  Patients: 82
-  Samples per epoch: 224
-  Magnifications: [40, 100, 200, 400]
-📈 Using batch size: 16 | Workers: 8 | Environment: runpod
-Starting training...
-Starting 25 epoch training with warmup for 3 epochs
-Early stopping patience: 8 epochs
-
-Epoch 1/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:28<00:00,  2.78it/s, loss=0.1226]
-Validating: 100%|------------| 14/14 [00:18<00:00,  1.33s/it]
-Train - Loss: 0.1678, Acc: 0.9615, F1: 0.9615, Bal_Acc: 0.9615
-Val - Loss: 0.3099, Acc: 0.9777, F1: 0.9779, Bal_Acc: 0.9836
-Per-class Acc: (B: 1.0000, M: 0.9671)
-Tumor Acc: 0.7768, LR: 0.00e+00
-🎯 New best accuracy: 0.9777 (Bal: 0.9836) - Model saved!
-   Per-class performance: B=1.0000, M=0.9671 ✅
-
-Epoch 2/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.19it/s, loss=0.1168]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.35it/s]
-Train - Loss: 0.1297, Acc: 0.9768, F1: 0.9768, Bal_Acc: 0.9768
-Val - Loss: 0.3629, Acc: 0.9464, F1: 0.9466, Bal_Acc: 0.9423
-Per-class Acc: (B: 0.9306, M: 0.9539)
-Tumor Acc: 0.7589, LR: 1.67e-04
-No improvement for 1/8 epochs
-
-Epoch 3/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.26it/s, loss=0.0847]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.89it/s]
-Train - Loss: 0.1534, Acc: 0.9599, F1: 0.9599, Bal_Acc: 0.9599
-Val - Loss: 0.4027, Acc: 0.9509, F1: 0.9511, Bal_Acc: 0.9492
-Per-class Acc: (B: 0.9444, M: 0.9539)
-Tumor Acc: 0.7455, LR: 3.33e-04
-No improvement for 2/8 epochs
-
-Epoch 4/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.23it/s, loss=0.1392]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.39it/s]
-Train - Loss: 0.1661, Acc: 0.9455, F1: 0.9455, Bal_Acc: 0.9455
-Val - Loss: 0.5252, Acc: 0.9554, F1: 0.9555, Bal_Acc: 0.9525
-Per-class Acc: (B: 0.9444, M: 0.9605)
-Tumor Acc: 0.6205, LR: 5.00e-04
-No improvement for 3/8 epochs
-
-Epoch 5/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.15it/s, loss=0.1226]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.39it/s]
-Train - Loss: 0.1667, Acc: 0.9423, F1: 0.9423, Bal_Acc: 0.9423
-Val - Loss: 0.4827, Acc: 0.9330, F1: 0.9340, Bal_Acc: 0.9397
-Per-class Acc: (B: 0.9583, M: 0.9211)
-Tumor Acc: 0.5759, LR: 4.97e-04
-No improvement for 4/8 epochs
-
-Epoch 6/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.25it/s, loss=0.1355]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.28it/s]
-Train - Loss: 0.2163, Acc: 0.9423, F1: 0.9423, Bal_Acc: 0.9423
-Val - Loss: 0.5449, Acc: 0.9643, F1: 0.9643, Bal_Acc: 0.9591
-Per-class Acc: (B: 0.9444, M: 0.9737)
-Tumor Acc: 0.4866, LR: 4.90e-04
-No improvement for 5/8 epochs
-
-Epoch 7/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.26it/s, loss=0.1407]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.43it/s]
-Train - Loss: 0.1972, Acc: 0.9407, F1: 0.9407, Bal_Acc: 0.9407
-Val - Loss: 0.4573, Acc: 0.9196, F1: 0.9202, Bal_Acc: 0.9152
-Per-class Acc: (B: 0.9028, M: 0.9276)
-Tumor Acc: 0.6116, LR: 4.77e-04
-No improvement for 6/8 epochs
-
-Epoch 8/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.26it/s, loss=0.1389]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.64it/s]
-Train - Loss: 0.1653, Acc: 0.9543, F1: 0.9543, Bal_Acc: 0.9543
-Val - Loss: 0.5448, Acc: 0.9464, F1: 0.9471, Bal_Acc: 0.9532
-Per-class Acc: (B: 0.9722, M: 0.9342)
-Tumor Acc: 0.5045, LR: 4.60e-04
-No improvement for 7/8 epochs
-
-Epoch 9/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.11it/s, loss=0.1584]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.76it/s]
-Train - Loss: 0.1437, Acc: 0.9671, F1: 0.9671, Bal_Acc: 0.9671
-Val - Loss: 0.6483, Acc: 0.9241, F1: 0.9240, Bal_Acc: 0.9112
-Per-class Acc: (B: 0.8750, M: 0.9474)
-Tumor Acc: 0.5536, LR: 4.39e-04
-No improvement for 8/8 epochs
-
-⏹️ Early stopping triggered after 9 epochs
-Best standard accuracy: 0.9777
-Best balanced accuracy: 0.9836
-
-=== DETAILED CLASSIFICATION REPORT ===
-              precision    recall  f1-score   support
-
-      benign     0.8873    0.8750    0.8811        72
-   malignant     0.9412    0.9474    0.9443       152
-
-    accuracy                         0.9241       224
-   macro avg     0.9143    0.9112    0.9127       224
-weighted avg     0.9239    0.9241    0.9240       224
-
-
-=== CONFUSION MATRIX ===
-Predicted:  benign  malignant
-benign:         63        9
-malignant:       8      144
-
-=== KEY INSIGHTS ===
-Benign Recall: 0.8750 (63/72)
-Malignant Recall: 0.9474 (144/152)
-
-Prediction distribution: benign=71, malignant=153
-Analyzing cross-magnification feature importance...
-
-Final Validation Accuracy: 0.9732
-
-Magnification Importance Analysis:
-40x contribution: 0.0615 ± 0.0575
-100x contribution: 0.0332 ± 0.0561
-200x contribution: 0.0374 ± 0.0751
-400x contribution: 0.0447 ± 0.0536
-==== Fold 3 ====
-Balanced dataset: 624 benign, 624 malignant
-Dataset initialized:
-  Mode: train
-  Patients: 82
-  Samples per epoch: 1248
-  Magnifications: [40, 100, 200, 400]
-Dataset initialized:
-  Mode: test
-  Patients: 82
-  Samples per epoch: 224
-  Magnifications: [40, 100, 200, 400]
-📈 Using batch size: 16 | Workers: 8 | Environment: runpod
-Starting training...
-Starting 25 epoch training with warmup for 3 epochs
-Early stopping patience: 8 epochs
-
-Epoch 1/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:27<00:00,  2.83it/s, loss=0.1142]
-Validating: 100%|------------| 14/14 [00:19<00:00,  1.39s/it]
-Train - Loss: 0.1893, Acc: 0.9479, F1: 0.9479, Bal_Acc: 0.9479
-Val - Loss: 0.3285, Acc: 0.9911, F1: 0.9911, Bal_Acc: 0.9934
-Per-class Acc: (B: 1.0000, M: 0.9868)
-Tumor Acc: 0.7277, LR: 0.00e+00
-🎯 New best accuracy: 0.9911 (Bal: 0.9934) - Model saved!
-   Per-class performance: B=1.0000, M=0.9868 ✅
-
-Epoch 2/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.05it/s, loss=0.1356]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.76it/s]
-Train - Loss: 0.1502, Acc: 0.9704, F1: 0.9704, Bal_Acc: 0.9704
-Val - Loss: 0.3459, Acc: 0.9732, F1: 0.9731, Bal_Acc: 0.9656
-Per-class Acc: (B: 0.9444, M: 0.9868)
-Tumor Acc: 0.7679, LR: 1.67e-04
-No improvement for 1/8 epochs
-
-Epoch 3/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.08it/s, loss=0.1060]
-Validating: 100%|------------| 14/14 [00:01<00:00,  9.76it/s]
-Train - Loss: 0.1741, Acc: 0.9431, F1: 0.9431, Bal_Acc: 0.9431
-Val - Loss: 0.5665, Acc: 0.9554, F1: 0.9555, Bal_Acc: 0.9525
-Per-class Acc: (B: 0.9444, M: 0.9605)
-Tumor Acc: 0.5312, LR: 3.33e-04
-No improvement for 2/8 epochs
-
-Epoch 4/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  7.87it/s, loss=0.5256]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.55it/s]
-Train - Loss: 0.2079, Acc: 0.9327, F1: 0.9327, Bal_Acc: 0.9327
-Val - Loss: 0.4811, Acc: 0.9777, F1: 0.9776, Bal_Acc: 0.9726
-Per-class Acc: (B: 0.9583, M: 0.9868)
-Tumor Acc: 0.5402, LR: 5.00e-04
-No improvement for 3/8 epochs
-
-Epoch 5/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.06it/s, loss=0.3457]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.43it/s]
-Train - Loss: 0.2093, Acc: 0.9415, F1: 0.9415, Bal_Acc: 0.9415
-Val - Loss: 0.4468, Acc: 0.9777, F1: 0.9776, Bal_Acc: 0.9689
-Per-class Acc: (B: 0.9444, M: 0.9934)
-Tumor Acc: 0.6518, LR: 4.97e-04
-No improvement for 4/8 epochs
-
-Epoch 6/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  7.97it/s, loss=0.1055]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.55it/s]
-Train - Loss: 0.2094, Acc: 0.9359, F1: 0.9359, Bal_Acc: 0.9359
-Val - Loss: 0.4834, Acc: 0.9464, F1: 0.9468, Bal_Acc: 0.9459
-Per-class Acc: (B: 0.9444, M: 0.9474)
-Tumor Acc: 0.6161, LR: 4.90e-04
-No improvement for 5/8 epochs
-
-Epoch 7/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.25it/s, loss=0.1440]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.35it/s]
-Train - Loss: 0.1702, Acc: 0.9423, F1: 0.9423, Bal_Acc: 0.9423
-Val - Loss: 0.5088, Acc: 0.9375, F1: 0.9375, Bal_Acc: 0.9284
-Per-class Acc: (B: 0.9028, M: 0.9539)
-Tumor Acc: 0.5848, LR: 4.77e-04
-No improvement for 6/8 epochs
-
-Epoch 8/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  7.84it/s, loss=0.1293]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.73it/s]
-Train - Loss: 0.1602, Acc: 0.9607, F1: 0.9607, Bal_Acc: 0.9607
-Val - Loss: 0.4096, Acc: 0.9955, F1: 0.9955, Bal_Acc: 0.9931
-Per-class Acc: (B: 0.9861, M: 1.0000)
-Tumor Acc: 0.6562, LR: 4.60e-04
-🎯 New best accuracy: 0.9955 (Bal: 0.9931) - Model saved!
-   Per-class performance: B=0.9861, M=1.0000 ✅
-
-Epoch 9/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.03it/s, loss=0.1456]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.81it/s]
-Train - Loss: 0.1699, Acc: 0.9479, F1: 0.9479, Bal_Acc: 0.9479
-Val - Loss: 0.4817, Acc: 0.9152, F1: 0.9159, Bal_Acc: 0.9119
-Per-class Acc: (B: 0.9028, M: 0.9211)
-Tumor Acc: 0.5312, LR: 4.39e-04
-No improvement for 1/8 epochs
-
-Epoch 10/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.30it/s, loss=0.1175]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.71it/s]
-Train - Loss: 0.1507, Acc: 0.9543, F1: 0.9543, Bal_Acc: 0.9543
-Val - Loss: 0.4352, Acc: 0.9821, F1: 0.9821, Bal_Acc: 0.9759
-Per-class Acc: (B: 0.9583, M: 0.9934)
-Tumor Acc: 0.6562, LR: 4.14e-04
-No improvement for 2/8 epochs
-
-Epoch 11/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:10<00:00,  7.50it/s, loss=0.1250]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.64it/s]
-Train - Loss: 0.1566, Acc: 0.9559, F1: 0.9559, Bal_Acc: 0.9559
-Val - Loss: 0.4494, Acc: 0.9286, F1: 0.9299, Bal_Acc: 0.9401
-Per-class Acc: (B: 0.9722, M: 0.9079)
-Tumor Acc: 0.5938, LR: 3.85e-04
-No improvement for 3/8 epochs
-
-Epoch 12/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  7.90it/s, loss=0.1114]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.86it/s]
-Train - Loss: 0.1122, Acc: 0.9768, F1: 0.9768, Bal_Acc: 0.9768
-Val - Loss: 0.4759, Acc: 0.9598, F1: 0.9600, Bal_Acc: 0.9594
-Per-class Acc: (B: 0.9583, M: 0.9605)
-Tumor Acc: 0.5402, LR: 3.54e-04
-No improvement for 4/8 epochs
-
-Epoch 13/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  7.86it/s, loss=0.0813]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.56it/s]
-Train - Loss: 0.1091, Acc: 0.9784, F1: 0.9784, Bal_Acc: 0.9784
-Val - Loss: 0.4641, Acc: 0.9420, F1: 0.9411, Bal_Acc: 0.9207
-Per-class Acc: (B: 0.8611, M: 0.9803)
-Tumor Acc: 0.6205, LR: 3.20e-04
-No improvement for 5/8 epochs
-
-Epoch 14/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.00it/s, loss=0.0691]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.87it/s]
-Train - Loss: 0.0923, Acc: 0.9864, F1: 0.9864, Bal_Acc: 0.9864
-Val - Loss: 0.4406, Acc: 0.9420, F1: 0.9416, Bal_Acc: 0.9280
-Per-class Acc: (B: 0.8889, M: 0.9671)
-Tumor Acc: 0.6429, LR: 2.86e-04
-No improvement for 6/8 epochs
-
-Epoch 15/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.15it/s, loss=0.0609]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.26it/s]
-Train - Loss: 0.1005, Acc: 0.9832, F1: 0.9832, Bal_Acc: 0.9832
-Val - Loss: 0.3943, Acc: 0.9777, F1: 0.9775, Bal_Acc: 0.9653
-Per-class Acc: (B: 0.9306, M: 1.0000)
-Tumor Acc: 0.6652, LR: 2.50e-04
-No improvement for 7/8 epochs
-
-Epoch 16/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.35it/s, loss=0.0637]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.53it/s]
-Train - Loss: 0.0961, Acc: 0.9824, F1: 0.9824, Bal_Acc: 0.9824
-Val - Loss: 0.5001, Acc: 0.9330, F1: 0.9321, Bal_Acc: 0.9105
-Per-class Acc: (B: 0.8472, M: 0.9737)
-Tumor Acc: 0.6339, LR: 2.14e-04
-No improvement - Per-class requirement not met (min: 0.8472 < 0.85)
-
-⏹️ Early stopping triggered after 16 epochs
-Best standard accuracy: 0.9955
-Best balanced accuracy: 0.9931
-
-=== DETAILED CLASSIFICATION REPORT ===
-              precision    recall  f1-score   support
-
-      benign     0.9385    0.8472    0.8905        72
-   malignant     0.9308    0.9737    0.9518       152
-
-    accuracy                         0.9330       224
-   macro avg     0.9346    0.9105    0.9211       224
-weighted avg     0.9333    0.9330    0.9321       224
-
-
-=== CONFUSION MATRIX ===
-Predicted:  benign  malignant
-benign:         61       11
-malignant:       4      148
-
-=== KEY INSIGHTS ===
-Benign Recall: 0.8472 (61/72)
-Malignant Recall: 0.9737 (148/152)
-
-Prediction distribution: benign=65, malignant=159
-Analyzing cross-magnification feature importance...
-
-Final Validation Accuracy: 0.9955
-
-Magnification Importance Analysis:
-40x contribution: 0.0649 ± 0.0650
-100x contribution: 0.0472 ± 0.0655
-200x contribution: 0.0419 ± 0.0791
-400x contribution: 0.0269 ± 0.0359
-==== Fold 4 ====
-Balanced dataset: 624 benign, 624 malignant
-Dataset initialized:
-  Mode: train
-  Patients: 82
-  Samples per epoch: 1248
-  Magnifications: [40, 100, 200, 400]
-Dataset initialized:
-  Mode: test
-  Patients: 82
-  Samples per epoch: 224
-  Magnifications: [40, 100, 200, 400]
-📈 Using batch size: 16 | Workers: 8 | Environment: runpod
-Starting training...
-Starting 25 epoch training with warmup for 3 epochs
-Early stopping patience: 8 epochs
-
-Epoch 1/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:27<00:00,  2.87it/s, loss=0.1179]
-Validating: 100%|------------| 14/14 [00:18<00:00,  1.35s/it]
-Train - Loss: 0.1894, Acc: 0.9543, F1: 0.9543, Bal_Acc: 0.9543
-Val - Loss: 0.4102, Acc: 0.9688, F1: 0.9687, Bal_Acc: 0.9624
-Per-class Acc: (B: 0.9444, M: 0.9803)
-Tumor Acc: 0.6652, LR: 0.00e+00
-🎯 New best accuracy: 0.9688 (Bal: 0.9624) - Model saved!
-   Per-class performance: B=0.9444, M=0.9803 ✅
-
-Epoch 2/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.40it/s, loss=0.0901]
-Validating: 100%|------------| 14/14 [00:01<00:00, 11.04it/s]
-Train - Loss: 0.1472, Acc: 0.9655, F1: 0.9655, Bal_Acc: 0.9655
-Val - Loss: 0.4297, Acc: 0.9554, F1: 0.9552, Bal_Acc: 0.9452
-Per-class Acc: (B: 0.9167, M: 0.9737)
-Tumor Acc: 0.6429, LR: 1.67e-04
-No improvement for 1/8 epochs
-
-Epoch 3/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.20it/s, loss=0.1087]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.90it/s]
-Train - Loss: 0.1569, Acc: 0.9607, F1: 0.9607, Bal_Acc: 0.9607
-Val - Loss: 0.4230, Acc: 0.9330, F1: 0.9314, Bal_Acc: 0.9031
-Per-class Acc: (B: 0.8194, M: 0.9868)
-Tumor Acc: 0.7188, LR: 3.33e-04
-No improvement - Per-class requirement not met (min: 0.8194 < 0.85)
-
-Epoch 4/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.19it/s, loss=0.1746]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.69it/s]
-Train - Loss: 0.1561, Acc: 0.9551, F1: 0.9551, Bal_Acc: 0.9551
-Val - Loss: 0.5377, Acc: 0.9688, F1: 0.9687, Bal_Acc: 0.9624
-Per-class Acc: (B: 0.9444, M: 0.9803)
-Tumor Acc: 0.5268, LR: 5.00e-04
-No improvement for 3/8 epochs
-
-Epoch 5/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.10it/s, loss=0.1062]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.73it/s]
-Train - Loss: 0.1356, Acc: 0.9760, F1: 0.9760, Bal_Acc: 0.9760
-Val - Loss: 0.6684, Acc: 0.8973, F1: 0.8967, Bal_Acc: 0.8768
-Per-class Acc: (B: 0.8194, M: 0.9342)
-Tumor Acc: 0.5357, LR: 4.97e-04
-No improvement - Per-class requirement not met (min: 0.8194 < 0.85)
-
-Epoch 6/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.27it/s, loss=0.0951]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.61it/s]
-Train - Loss: 0.1819, Acc: 0.9527, F1: 0.9527, Bal_Acc: 0.9527
-Val - Loss: 1.4726, Acc: 0.8214, F1: 0.8237, Bal_Acc: 0.8099
-Per-class Acc: (B: 0.7778, M: 0.8421)
-Tumor Acc: 0.4911, LR: 4.90e-04
-No improvement - Per-class requirement not met (min: 0.7778 < 0.85)
-
-Epoch 7/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.25it/s, loss=0.1899]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.81it/s]
-Train - Loss: 0.2263, Acc: 0.9335, F1: 0.9335, Bal_Acc: 0.9335
-Val - Loss: 0.8285, Acc: 0.8795, F1: 0.8753, Bal_Acc: 0.8344
-Per-class Acc: (B: 0.7083, M: 0.9605)
-Tumor Acc: 0.2723, LR: 4.77e-04
-No improvement - Per-class requirement not met (min: 0.7083 < 0.85)
-
-Epoch 8/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.33it/s, loss=0.1369]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.56it/s]
-Train - Loss: 0.2030, Acc: 0.9423, F1: 0.9423, Bal_Acc: 0.9423
-Val - Loss: 0.5780, Acc: 0.9018, F1: 0.9010, Bal_Acc: 0.8801
-Per-class Acc: (B: 0.8194, M: 0.9408)
-Tumor Acc: 0.5938, LR: 4.60e-04
-No improvement - Per-class requirement not met (min: 0.8194 < 0.85)
-
-Epoch 9/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.11it/s, loss=0.0946]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.57it/s]
-Train - Loss: 0.1498, Acc: 0.9647, F1: 0.9647, Bal_Acc: 0.9647
-Val - Loss: 0.5113, Acc: 0.9018, F1: 0.9002, Bal_Acc: 0.8728
-Per-class Acc: (B: 0.7917, M: 0.9539)
-Tumor Acc: 0.6116, LR: 4.39e-04
-No improvement - Per-class requirement not met (min: 0.7917 < 0.85)
-
-⏹️ Early stopping triggered after 9 epochs
-Best standard accuracy: 0.9688
-Best balanced accuracy: 0.9624
-
-=== DETAILED CLASSIFICATION REPORT ===
-              precision    recall  f1-score   support
-
-      benign     0.8906    0.7917    0.8382        72
-   malignant     0.9062    0.9539    0.9295       152
-
-    accuracy                         0.9018       224
-   macro avg     0.8984    0.8728    0.8839       224
-weighted avg     0.9012    0.9018    0.9002       224
-
-
-=== CONFUSION MATRIX ===
-Predicted:  benign  malignant
-benign:         57       15
-malignant:       7      145
-
-=== KEY INSIGHTS ===
-Benign Recall: 0.7917 (57/72)
-Malignant Recall: 0.9539 (145/152)
-
-Prediction distribution: benign=64, malignant=160
-Analyzing cross-magnification feature importance...
-
-Final Validation Accuracy: 0.9911
-
-Magnification Importance Analysis:
-40x contribution: 0.0626 ± 0.0863
-100x contribution: 0.0459 ± 0.0604
-200x contribution: 0.0296 ± 0.0613
-400x contribution: 0.0287 ± 0.0544
-==== Fold 5 ====
-Balanced dataset: 624 benign, 624 malignant
-Dataset initialized:
-  Mode: train
-  Patients: 82
-  Samples per epoch: 1248
-  Magnifications: [40, 100, 200, 400]
-Dataset initialized:
-  Mode: test
-  Patients: 82
-  Samples per epoch: 224
-  Magnifications: [40, 100, 200, 400]
-📈 Using batch size: 16 | Workers: 8 | Environment: runpod
-Starting training...
-Starting 25 epoch training with warmup for 3 epochs
-Early stopping patience: 8 epochs
-
-Epoch 1/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:26<00:00,  2.94it/s, loss=0.0899]
-Validating: 100%|------------| 14/14 [00:18<00:00,  1.32s/it]
-Train - Loss: 0.1788, Acc: 0.9567, F1: 0.9567, Bal_Acc: 0.9567
-Val - Loss: 0.3804, Acc: 0.9554, F1: 0.9544, Bal_Acc: 0.9306
-Per-class Acc: (B: 0.8611, M: 1.0000)
-Tumor Acc: 0.7054, LR: 0.00e+00
-🎯 New best accuracy: 0.9554 (Bal: 0.9306) - Model saved!
-   Per-class performance: B=0.8611, M=1.0000 ✅
-
-Epoch 2/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.54it/s, loss=0.1758]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.64it/s]
-Train - Loss: 0.1479, Acc: 0.9679, F1: 0.9679, Bal_Acc: 0.9679
-Val - Loss: 0.3933, Acc: 0.9688, F1: 0.9683, Bal_Acc: 0.9514
-Per-class Acc: (B: 0.9028, M: 1.0000)
-Tumor Acc: 0.6116, LR: 1.67e-04
-🎯 New best accuracy: 0.9688 (Bal: 0.9514) - Model saved!
-   Per-class performance: B=0.9028, M=1.0000 ✅
-
-Epoch 3/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.48it/s, loss=0.0631]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.78it/s]
-Train - Loss: 0.1465, Acc: 0.9631, F1: 0.9631, Bal_Acc: 0.9631
-Val - Loss: 0.4452, Acc: 0.9777, F1: 0.9776, Bal_Acc: 0.9726
-Per-class Acc: (B: 0.9583, M: 0.9868)
-Tumor Acc: 0.6875, LR: 3.33e-04
-🎯 New best accuracy: 0.9777 (Bal: 0.9726) - Model saved!
-   Per-class performance: B=0.9583, M=0.9868 ✅
-
-Epoch 4/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.51it/s, loss=0.1240]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.47it/s]
-Train - Loss: 0.1877, Acc: 0.9495, F1: 0.9495, Bal_Acc: 0.9495
-Val - Loss: 0.5632, Acc: 0.9420, F1: 0.9406, Bal_Acc: 0.9134
-Per-class Acc: (B: 0.8333, M: 0.9934)
-Tumor Acc: 0.5089, LR: 5.00e-04
-No improvement - Per-class requirement not met (min: 0.8333 < 0.85)
-
-Epoch 5/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.12it/s, loss=0.1719]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.25it/s]
-Train - Loss: 0.1871, Acc: 0.9495, F1: 0.9495, Bal_Acc: 0.9495
-Val - Loss: 0.4763, Acc: 0.9732, F1: 0.9735, Bal_Acc: 0.9803
-Per-class Acc: (B: 1.0000, M: 0.9605)
-Tumor Acc: 0.6071, LR: 4.97e-04
-No improvement for 2/8 epochs
-
-Epoch 6/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:10<00:00,  7.80it/s, loss=0.1707]
-Validating: 100%|------------| 14/14 [00:01<00:00,  9.81it/s]
-Train - Loss: 0.1595, Acc: 0.9551, F1: 0.9551, Bal_Acc: 0.9551
-Val - Loss: 0.4986, Acc: 0.9375, F1: 0.9373, Bal_Acc: 0.9247
-Per-class Acc: (B: 0.8889, M: 0.9605)
-Tumor Acc: 0.5223, LR: 4.90e-04
-No improvement for 3/8 epochs
-
-Epoch 7/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:10<00:00,  7.78it/s, loss=0.0972]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.09it/s]
-Train - Loss: 0.1627, Acc: 0.9535, F1: 0.9535, Bal_Acc: 0.9535
-Val - Loss: 0.5636, Acc: 0.8973, F1: 0.8990, Bal_Acc: 0.9024
-Per-class Acc: (B: 0.9167, M: 0.8882)
-Tumor Acc: 0.5446, LR: 4.77e-04
-No improvement for 4/8 epochs
-
-Epoch 8/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.06it/s, loss=0.1420]
-Validating: 100%|------------| 14/14 [00:01<00:00,  9.38it/s]
-Train - Loss: 0.1635, Acc: 0.9535, F1: 0.9535, Bal_Acc: 0.9535
-Val - Loss: 0.5484, Acc: 0.9241, F1: 0.9237, Bal_Acc: 0.9075
-Per-class Acc: (B: 0.8611, M: 0.9539)
-Tumor Acc: 0.4866, LR: 4.60e-04
-No improvement for 5/8 epochs
-
-Epoch 9/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.34it/s, loss=0.1372]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.08it/s]
-Train - Loss: 0.1310, Acc: 0.9720, F1: 0.9720, Bal_Acc: 0.9720
-Val - Loss: 0.4855, Acc: 0.9509, F1: 0.9511, Bal_Acc: 0.9492
-Per-class Acc: (B: 0.9444, M: 0.9539)
-Tumor Acc: 0.5625, LR: 4.39e-04
-No improvement for 6/8 epochs
-
-Epoch 10/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.29it/s, loss=0.0908]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.44it/s]
-Train - Loss: 0.1347, Acc: 0.9655, F1: 0.9655, Bal_Acc: 0.9655
-Val - Loss: 0.6432, Acc: 0.9196, F1: 0.9179, Bal_Acc: 0.8896
-Per-class Acc: (B: 0.8056, M: 0.9737)
-Tumor Acc: 0.5179, LR: 4.14e-04
-No improvement - Per-class requirement not met (min: 0.8056 < 0.85)
-
-Epoch 11/25
---------------------------------------------------
-Training: 100%|------| 78/78 [00:09<00:00,  8.23it/s, loss=0.1332]
-Validating: 100%|------------| 14/14 [00:01<00:00, 10.22it/s]
-Train - Loss: 0.1686, Acc: 0.9447, F1: 0.9447, Bal_Acc: 0.9447
-Val - Loss: 0.6053, Acc: 0.9420, F1: 0.9426, Bal_Acc: 0.9463
-Per-class Acc: (B: 0.9583, M: 0.9342)
-Tumor Acc: 0.4330, LR: 3.85e-04
+Training: 100%|--------| 92/92 [00:22<00:00,  4.14it/s, loss=0.0811]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  5.12it/s]
+Train - Loss: 0.0794, Acc: 0.9891, F1: 0.9891, Bal_Acc: 0.9891
+Val - Loss: 0.6606, Acc: 0.9044, F1: 0.9048, Bal_Acc: 0.8885
+Per-class Acc: (B: 0.8500, M: 0.9271)
+Tumor Acc: 0.5809, LR: 3.85e-04
 No improvement for 8/8 epochs
 
 ⏹️ Early stopping triggered after 11 epochs
-Best standard accuracy: 0.9777
-Best balanced accuracy: 0.9726
+Best standard accuracy: 0.9191
+Best balanced accuracy: 0.8990
+
+📊 Loading best checkpoint for final evaluation...
+/workspace/BC-Attention-Fusion/main.py:181: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  checkpoint = torch.load(f'output/best_model_fold_{fold}.pth', map_location=device)
+🔍 Re-evaluating with best checkpoint...
 
 === DETAILED CLASSIFICATION REPORT ===
               precision    recall  f1-score   support
 
-      benign     0.8734    0.9583    0.9139        72
-   malignant     0.9793    0.9342    0.9562       152
+      benign     0.8571    0.7500    0.8000        40
+   malignant     0.9010    0.9479    0.9239        96
 
-    accuracy                         0.9420       224
-   macro avg     0.9264    0.9463    0.9351       224
-weighted avg     0.9453    0.9420    0.9426       224
+    accuracy                         0.8897       136
+   macro avg     0.8791    0.8490    0.8619       136
+weighted avg     0.8881    0.8897    0.8874       136
 
 
 === CONFUSION MATRIX ===
 Predicted:  benign  malignant
-benign:         69        3
-malignant:      10      142
+benign:         30       10
+malignant:       5       91
 
 === KEY INSIGHTS ===
-Benign Recall: 0.9583 (69/72)
-Malignant Recall: 0.9342 (142/152)
+Benign Recall: 0.7500 (30/40)
+Malignant Recall: 0.9479 (91/96)
 
-Prediction distribution: benign=79, malignant=145
+Prediction distribution: benign=35, malignant=101
 Analyzing cross-magnification feature importance...
 
-Final Validation Accuracy: 0.9821
+Final Validation Accuracy: 0.9044
 
 Magnification Importance Analysis:
-40x contribution: 0.0662 ± 0.0882
-100x contribution: 0.0453 ± 0.0524
-200x contribution: 0.0346 ± 0.0788
-400x contribution: 0.0099 ± 0.0567
+40x contribution: 0.0375 ± 0.0702
+100x contribution: 0.0314 ± 0.0585
+200x contribution: 0.0256 ± 0.0768
+400x contribution: 0.0311 ± 0.0703
+==== Fold 2 ====
+Balanced dataset: 736 benign, 736 malignant
+Dataset initialized:
+  Mode: train
+  Patients: 82
+  Samples per epoch: 1472
+  Magnifications: [40, 100, 200, 400]
+Dataset initialized:
+  Mode: test
+  Patients: 82
+  Samples per epoch: 136
+  Magnifications: [40, 100, 200, 400]
+📈 Using batch size: 16 | Workers: 8 | Environment: runpod
+Starting training...
+Starting 25 epoch training with warmup for 3 epochs
+Early stopping patience: 8 epochs
+
+Epoch 1/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:57<00:00,  1.59it/s, loss=0.3078]
+Validating: 100%|----------------| 9/9 [00:37<00:00,  4.15s/it]
+Train - Loss: 0.2684, Acc: 0.9198, F1: 0.9198, Bal_Acc: 0.9198
+Val - Loss: 0.3830, Acc: 0.9926, F1: 0.9926, Bal_Acc: 0.9875
+Per-class Acc: (B: 0.9750, M: 1.0000)
+Tumor Acc: 0.6985, LR: 0.00e+00
+🎯 New best accuracy: 0.9926 (Bal: 0.9875) - Model saved!
+   Per-class performance: B=0.9750, M=1.0000 ✅
+
+Epoch 2/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:22<00:00,  4.12it/s, loss=0.1724]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  4.51it/s]
+Train - Loss: 0.2122, Acc: 0.9375, F1: 0.9375, Bal_Acc: 0.9375
+Val - Loss: 0.4418, Acc: 0.9632, F1: 0.9638, Bal_Acc: 0.9740
+Per-class Acc: (B: 1.0000, M: 0.9479)
+Tumor Acc: 0.6985, LR: 1.67e-04
+No improvement for 1/8 epochs
+
+Epoch 3/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:22<00:00,  4.12it/s, loss=0.1268]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  4.91it/s]
+Train - Loss: 0.2062, Acc: 0.9368, F1: 0.9368, Bal_Acc: 0.9368
+Val - Loss: 0.4539, Acc: 0.9191, F1: 0.9167, Bal_Acc: 0.8771
+Per-class Acc: (B: 0.7750, M: 0.9792)
+Tumor Acc: 0.6618, LR: 3.33e-04
+No improvement - Per-class requirement not met (min: 0.7750 < 0.85)
+
+Epoch 4/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:22<00:00,  4.11it/s, loss=0.3216]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  4.95it/s]
+Train - Loss: 0.2260, Acc: 0.9266, F1: 0.9266, Bal_Acc: 0.9266
+Val - Loss: 0.4784, Acc: 0.9559, F1: 0.9552, Bal_Acc: 0.9323
+Per-class Acc: (B: 0.8750, M: 0.9896)
+Tumor Acc: 0.6103, LR: 5.00e-04
+No improvement for 3/8 epochs
+
+Epoch 5/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:22<00:00,  4.17it/s, loss=0.1515]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  4.51it/s]
+Train - Loss: 0.2203, Acc: 0.9341, F1: 0.9341, Bal_Acc: 0.9341
+Val - Loss: 0.4157, Acc: 0.9779, F1: 0.9782, Bal_Acc: 0.9844
+Per-class Acc: (B: 1.0000, M: 0.9688)
+Tumor Acc: 0.6838, LR: 4.97e-04
+No improvement for 4/8 epochs
+
+Epoch 6/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:22<00:00,  4.12it/s, loss=0.2149]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  4.97it/s]
+Train - Loss: 0.2174, Acc: 0.9253, F1: 0.9253, Bal_Acc: 0.9253
+Val - Loss: 0.4510, Acc: 0.9853, F1: 0.9852, Bal_Acc: 0.9750
+Per-class Acc: (B: 0.9500, M: 1.0000)
+Tumor Acc: 0.6103, LR: 4.90e-04
+No improvement for 5/8 epochs
+
+Epoch 7/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:22<00:00,  4.12it/s, loss=0.1119]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  4.97it/s]
+Train - Loss: 0.1944, Acc: 0.9402, F1: 0.9402, Bal_Acc: 0.9402
+Val - Loss: 0.4009, Acc: 0.9926, F1: 0.9926, Bal_Acc: 0.9875
+Per-class Acc: (B: 0.9750, M: 1.0000)
+Tumor Acc: 0.6324, LR: 4.77e-04
+No improvement for 6/8 epochs
+
+Epoch 8/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:22<00:00,  4.10it/s, loss=0.1616]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  5.09it/s]
+Train - Loss: 0.1745, Acc: 0.9538, F1: 0.9538, Bal_Acc: 0.9538
+Val - Loss: 0.4570, Acc: 0.9559, F1: 0.9548, Bal_Acc: 0.9250
+Per-class Acc: (B: 0.8500, M: 1.0000)
+Tumor Acc: 0.6397, LR: 4.60e-04
+No improvement for 7/8 epochs
+
+Epoch 9/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:22<00:00,  4.16it/s, loss=0.1041]
+Validating: 100%|----------------| 9/9 [00:01<00:00,  5.01it/s]
+Train - Loss: 0.1586, Acc: 0.9572, F1: 0.9572, Bal_Acc: 0.9572
+Val - Loss: 0.3934, Acc: 0.9853, F1: 0.9853, Bal_Acc: 0.9823
+Per-class Acc: (B: 0.9750, M: 0.9896)
+Tumor Acc: 0.6471, LR: 4.39e-04
+No improvement for 8/8 epochs
+
+⏹️ Early stopping triggered after 9 epochs
+Best standard accuracy: 0.9926
+Best balanced accuracy: 0.9875
+
+📊 Loading best checkpoint for final evaluation...
+/workspace/BC-Attention-Fusion/main.py:181: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  checkpoint = torch.load(f'output/best_model_fold_{fold}.pth', map_location=device)
+🔍 Re-evaluating with best checkpoint...
+
+=== DETAILED CLASSIFICATION REPORT ===
+              precision    recall  f1-score   support
+
+      benign     1.0000    0.9750    0.9873        40
+   malignant     0.9897    1.0000    0.9948        96
+
+    accuracy                         0.9926       136
+   macro avg     0.9948    0.9875    0.9911       136
+weighted avg     0.9927    0.9926    0.9926       136
+
+
+=== CONFUSION MATRIX ===
+Predicted:  benign  malignant
+benign:         39        1
+malignant:       0       96
+
+=== KEY INSIGHTS ===
+Benign Recall: 0.9750 (39/40)
+Malignant Recall: 1.0000 (96/96)
+
+Prediction distribution: benign=39, malignant=97
+Analyzing cross-magnification feature importance...
+
+Final Validation Accuracy: 1.0000
+
+Magnification Importance Analysis:
+40x contribution: 0.0421 ± 0.0412
+100x contribution: 0.0557 ± 0.0721
+200x contribution: 0.0508 ± 0.0691
+400x contribution: 0.0276 ± 0.0416
+==== Fold 3 ====
+Balanced dataset: 752 benign, 752 malignant
+Dataset initialized:
+  Mode: train
+  Patients: 82
+  Samples per epoch: 1504
+  Magnifications: [40, 100, 200, 400]
+Dataset initialized:
+  Mode: test
+  Patients: 82
+  Samples per epoch: 128
+  Magnifications: [40, 100, 200, 400]
+📈 Using batch size: 16 | Workers: 8 | Environment: runpod
+Starting training...
+Starting 25 epoch training with warmup for 3 epochs
+Early stopping patience: 8 epochs
+
+Epoch 1/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:57<00:00,  1.62it/s, loss=0.3152]
+Validating: 100%|----------------| 8/8 [00:36<00:00,  4.58s/it]
+Train - Loss: 0.2665, Acc: 0.9122, F1: 0.9122, Bal_Acc: 0.9122
+Val - Loss: 0.3788, Acc: 1.0000, F1: 1.0000, Bal_Acc: 1.0000
+Per-class Acc: (B: 1.0000, M: 1.0000)
+Tumor Acc: 0.7578, LR: 0.00e+00
+🎯 New best accuracy: 1.0000 (Bal: 1.0000) - Model saved!
+   Per-class performance: B=1.0000, M=1.0000 ✅
+
+Epoch 2/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:22<00:00,  4.17it/s, loss=0.2124]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  4.87it/s]
+Train - Loss: 0.2216, Acc: 0.9335, F1: 0.9335, Bal_Acc: 0.9335
+Val - Loss: 0.4604, Acc: 0.9297, F1: 0.9277, Bal_Acc: 0.8943
+Per-class Acc: (B: 0.8000, M: 0.9886)
+Tumor Acc: 0.7500, LR: 1.67e-04
+No improvement - Per-class requirement not met (min: 0.8000 < 0.85)
+
+Epoch 3/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:22<00:00,  4.13it/s, loss=0.1695]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  4.65it/s]
+Train - Loss: 0.1923, Acc: 0.9461, F1: 0.9461, Bal_Acc: 0.9461
+Val - Loss: 0.5988, Acc: 0.8281, F1: 0.8205, Bal_Acc: 0.7659
+Per-class Acc: (B: 0.6000, M: 0.9318)
+Tumor Acc: 0.5391, LR: 3.33e-04
+No improvement - Per-class requirement not met (min: 0.6000 < 0.85)
+
+Epoch 4/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:22<00:00,  4.13it/s, loss=0.1534]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  4.93it/s]
+Train - Loss: 0.2000, Acc: 0.9355, F1: 0.9355, Bal_Acc: 0.9355
+Val - Loss: 0.6151, Acc: 0.8516, F1: 0.8487, Bal_Acc: 0.8102
+Per-class Acc: (B: 0.7000, M: 0.9205)
+Tumor Acc: 0.4844, LR: 5.00e-04
+No improvement - Per-class requirement not met (min: 0.7000 < 0.85)
+
+Epoch 5/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:22<00:00,  4.12it/s, loss=0.3917]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  4.85it/s]
+Train - Loss: 0.2117, Acc: 0.9415, F1: 0.9415, Bal_Acc: 0.9415
+Val - Loss: 0.6067, Acc: 0.9141, F1: 0.9124, Bal_Acc: 0.8830
+Per-class Acc: (B: 0.8000, M: 0.9659)
+Tumor Acc: 0.4453, LR: 4.97e-04
+No improvement - Per-class requirement not met (min: 0.8000 < 0.85)
+
+Epoch 6/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:22<00:00,  4.17it/s, loss=0.1184]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  5.08it/s]
+Train - Loss: 0.2124, Acc: 0.9375, F1: 0.9375, Bal_Acc: 0.9375
+Val - Loss: 0.6645, Acc: 0.8125, F1: 0.8062, Bal_Acc: 0.7545
+Per-class Acc: (B: 0.6000, M: 0.9091)
+Tumor Acc: 0.5547, LR: 4.90e-04
+No improvement - Per-class requirement not met (min: 0.6000 < 0.85)
+
+Epoch 7/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:22<00:00,  4.16it/s, loss=0.2639]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  4.94it/s]
+Train - Loss: 0.1756, Acc: 0.9548, F1: 0.9548, Bal_Acc: 0.9548
+Val - Loss: 0.6698, Acc: 0.8203, F1: 0.8183, Bal_Acc: 0.7807
+Per-class Acc: (B: 0.6750, M: 0.8864)
+Tumor Acc: 0.4531, LR: 4.77e-04
+No improvement - Per-class requirement not met (min: 0.6750 < 0.85)
+
+Epoch 8/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:22<00:00,  4.16it/s, loss=0.1069]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  5.04it/s]
+Train - Loss: 0.1498, Acc: 0.9641, F1: 0.9641, Bal_Acc: 0.9641
+Val - Loss: 0.7328, Acc: 0.8281, F1: 0.8240, Bal_Acc: 0.7795
+Per-class Acc: (B: 0.6500, M: 0.9091)
+Tumor Acc: 0.4609, LR: 4.60e-04
+No improvement - Per-class requirement not met (min: 0.6500 < 0.85)
+
+Epoch 9/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:22<00:00,  4.17it/s, loss=0.2152]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  4.93it/s]
+Train - Loss: 0.1335, Acc: 0.9721, F1: 0.9721, Bal_Acc: 0.9721
+Val - Loss: 0.9277, Acc: 0.8828, F1: 0.8815, Bal_Acc: 0.8534
+Per-class Acc: (B: 0.7750, M: 0.9318)
+Tumor Acc: 0.4688, LR: 4.39e-04
+No improvement - Per-class requirement not met (min: 0.7750 < 0.85)
+
+⏹️ Early stopping triggered after 9 epochs
+Best standard accuracy: 1.0000
+Best balanced accuracy: 1.0000
+
+📊 Loading best checkpoint for final evaluation...
+/workspace/BC-Attention-Fusion/main.py:181: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  checkpoint = torch.load(f'output/best_model_fold_{fold}.pth', map_location=device)
+🔍 Re-evaluating with best checkpoint...
+
+=== DETAILED CLASSIFICATION REPORT ===
+              precision    recall  f1-score   support
+
+      benign     1.0000    0.9750    0.9873        40
+   malignant     0.9888    1.0000    0.9944        88
+
+    accuracy                         0.9922       128
+   macro avg     0.9944    0.9875    0.9908       128
+weighted avg     0.9923    0.9922    0.9922       128
+
+
+=== CONFUSION MATRIX ===
+Predicted:  benign  malignant
+benign:         39        1
+malignant:       0       88
+
+=== KEY INSIGHTS ===
+Benign Recall: 0.9750 (39/40)
+Malignant Recall: 1.0000 (88/88)
+
+Prediction distribution: benign=39, malignant=89
+Analyzing cross-magnification feature importance...
+
+Final Validation Accuracy: 0.9922
+
+Magnification Importance Analysis:
+40x contribution: 0.0608 ± 0.0631
+100x contribution: 0.0358 ± 0.0569
+200x contribution: 0.0346 ± 0.0698
+400x contribution: 0.0393 ± 0.0489
+==== Fold 4 ====
+Balanced dataset: 752 benign, 752 malignant
+Dataset initialized:
+  Mode: train
+  Patients: 82
+  Samples per epoch: 1504
+  Magnifications: [40, 100, 200, 400]
+Dataset initialized:
+  Mode: test
+  Patients: 82
+  Samples per epoch: 128
+  Magnifications: [40, 100, 200, 400]
+📈 Using batch size: 16 | Workers: 8 | Environment: runpod
+Starting training...
+Starting 25 epoch training with warmup for 3 epochs
+Early stopping patience: 8 epochs
+
+Epoch 1/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:58<00:00,  1.61it/s, loss=0.1627]
+Validating: 100%|----------------| 8/8 [00:36<00:00,  4.58s/it]
+Train - Loss: 0.2408, Acc: 0.9209, F1: 0.9209, Bal_Acc: 0.9209
+Val - Loss: 0.4037, Acc: 1.0000, F1: 1.0000, Bal_Acc: 1.0000
+Per-class Acc: (B: 1.0000, M: 1.0000)
+Tumor Acc: 0.6797, LR: 0.00e+00
+🎯 New best accuracy: 1.0000 (Bal: 1.0000) - Model saved!
+   Per-class performance: B=1.0000, M=1.0000 ✅
+
+Epoch 2/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:22<00:00,  4.16it/s, loss=0.2698]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  5.08it/s]
+Train - Loss: 0.1852, Acc: 0.9521, F1: 0.9521, Bal_Acc: 0.9521
+Val - Loss: 0.5392, Acc: 0.8984, F1: 0.8994, Bal_Acc: 0.8920
+Per-class Acc: (B: 0.8750, M: 0.9091)
+Tumor Acc: 0.5234, LR: 1.67e-04
+No improvement for 1/8 epochs
+
+Epoch 3/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:22<00:00,  4.15it/s, loss=0.1171]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  5.15it/s]
+Train - Loss: 0.2078, Acc: 0.9295, F1: 0.9295, Bal_Acc: 0.9295
+Val - Loss: 0.5848, Acc: 0.9062, F1: 0.9040, Bal_Acc: 0.8705
+Per-class Acc: (B: 0.7750, M: 0.9659)
+Tumor Acc: 0.5469, LR: 3.33e-04
+No improvement - Per-class requirement not met (min: 0.7750 < 0.85)
+
+Epoch 4/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:22<00:00,  4.13it/s, loss=0.1538]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  4.82it/s]
+Train - Loss: 0.2087, Acc: 0.9289, F1: 0.9289, Bal_Acc: 0.9289
+Val - Loss: 0.6069, Acc: 0.8984, F1: 0.8981, Bal_Acc: 0.8784
+Per-class Acc: (B: 0.8250, M: 0.9318)
+Tumor Acc: 0.3906, LR: 5.00e-04
+No improvement - Per-class requirement not met (min: 0.8250 < 0.85)
+
+Epoch 5/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:23<00:00,  4.07it/s, loss=0.1616]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  5.12it/s]
+Train - Loss: 0.1971, Acc: 0.9455, F1: 0.9455, Bal_Acc: 0.9455
+Val - Loss: 0.6790, Acc: 0.8906, F1: 0.8880, Bal_Acc: 0.8523
+Per-class Acc: (B: 0.7500, M: 0.9545)
+Tumor Acc: 0.3203, LR: 4.97e-04
+No improvement - Per-class requirement not met (min: 0.7500 < 0.85)
+
+Epoch 6/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:23<00:00,  4.04it/s, loss=0.1962]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  4.87it/s]
+Train - Loss: 0.2376, Acc: 0.9215, F1: 0.9215, Bal_Acc: 0.9215
+Val - Loss: 0.6182, Acc: 0.8906, F1: 0.8890, Bal_Acc: 0.8591
+Per-class Acc: (B: 0.7750, M: 0.9432)
+Tumor Acc: 0.4453, LR: 4.90e-04
+No improvement - Per-class requirement not met (min: 0.7750 < 0.85)
+
+Epoch 7/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:22<00:00,  4.11it/s, loss=0.0842]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  5.29it/s]
+Train - Loss: 0.1912, Acc: 0.9521, F1: 0.9521, Bal_Acc: 0.9521
+Val - Loss: 0.5789, Acc: 0.9297, F1: 0.9269, Bal_Acc: 0.8875
+Per-class Acc: (B: 0.7750, M: 1.0000)
+Tumor Acc: 0.4141, LR: 4.77e-04
+No improvement - Per-class requirement not met (min: 0.7750 < 0.85)
+
+Epoch 8/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:22<00:00,  4.09it/s, loss=0.4990]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  5.26it/s]
+Train - Loss: 0.1784, Acc: 0.9528, F1: 0.9528, Bal_Acc: 0.9528
+Val - Loss: 0.7062, Acc: 0.8906, F1: 0.8845, Bal_Acc: 0.8318
+Per-class Acc: (B: 0.6750, M: 0.9886)
+Tumor Acc: 0.3438, LR: 4.60e-04
+No improvement - Per-class requirement not met (min: 0.6750 < 0.85)
+
+Epoch 9/25
+--------------------------------------------------
+Training: 100%|--------| 94/94 [00:22<00:00,  4.17it/s, loss=0.1499]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  5.26it/s]
+Train - Loss: 0.1999, Acc: 0.9475, F1: 0.9475, Bal_Acc: 0.9475
+Val - Loss: 0.8246, Acc: 0.9297, F1: 0.9269, Bal_Acc: 0.8875
+Per-class Acc: (B: 0.7750, M: 1.0000)
+Tumor Acc: 0.2969, LR: 4.39e-04
+No improvement - Per-class requirement not met (min: 0.7750 < 0.85)
+
+⏹️ Early stopping triggered after 9 epochs
+Best standard accuracy: 1.0000
+Best balanced accuracy: 1.0000
+
+📊 Loading best checkpoint for final evaluation...
+/workspace/BC-Attention-Fusion/main.py:181: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  checkpoint = torch.load(f'output/best_model_fold_{fold}.pth', map_location=device)
+🔍 Re-evaluating with best checkpoint...
+
+=== DETAILED CLASSIFICATION REPORT ===
+              precision    recall  f1-score   support
+
+      benign     1.0000    0.9750    0.9873        40
+   malignant     0.9888    1.0000    0.9944        88
+
+    accuracy                         0.9922       128
+   macro avg     0.9944    0.9875    0.9908       128
+weighted avg     0.9923    0.9922    0.9922       128
+
+
+=== CONFUSION MATRIX ===
+Predicted:  benign  malignant
+benign:         39        1
+malignant:       0       88
+
+=== KEY INSIGHTS ===
+Benign Recall: 0.9750 (39/40)
+Malignant Recall: 1.0000 (88/88)
+
+Prediction distribution: benign=39, malignant=89
+Analyzing cross-magnification feature importance...
+
+Final Validation Accuracy: 0.9922
+
+Magnification Importance Analysis:
+40x contribution: 0.0460 ± 0.0432
+100x contribution: 0.0543 ± 0.0789
+200x contribution: 0.0345 ± 0.0598
+400x contribution: 0.0354 ± 0.0567
+==== Fold 5 ====
+Balanced dataset: 736 benign, 736 malignant
+Dataset initialized:
+  Mode: train
+  Patients: 82
+  Samples per epoch: 1472
+  Magnifications: [40, 100, 200, 400]
+Dataset initialized:
+  Mode: test
+  Patients: 82
+  Samples per epoch: 128
+  Magnifications: [40, 100, 200, 400]
+📈 Using batch size: 16 | Workers: 8 | Environment: runpod
+Starting training...
+Starting 25 epoch training with warmup for 3 epochs
+Early stopping patience: 8 epochs
+
+Epoch 1/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:58<00:00,  1.58it/s, loss=0.2420]
+Validating: 100%|----------------| 8/8 [00:36<00:00,  4.60s/it]
+Train - Loss: 0.2506, Acc: 0.9314, F1: 0.9314, Bal_Acc: 0.9314
+Val - Loss: 0.3864, Acc: 0.9844, F1: 0.9845, Bal_Acc: 0.9896
+Per-class Acc: (B: 1.0000, M: 0.9792)
+Tumor Acc: 0.8047, LR: 0.00e+00
+🎯 New best accuracy: 0.9844 (Bal: 0.9896) - Model saved!
+   Per-class performance: B=1.0000, M=0.9792 ✅
+
+Epoch 2/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:22<00:00,  4.12it/s, loss=0.1132]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  5.38it/s]
+Train - Loss: 0.2032, Acc: 0.9436, F1: 0.9436, Bal_Acc: 0.9436
+Val - Loss: 0.4864, Acc: 0.9062, F1: 0.9105, Bal_Acc: 0.9375
+Per-class Acc: (B: 1.0000, M: 0.8750)
+Tumor Acc: 0.7422, LR: 1.67e-04
+No improvement for 1/8 epochs
+
+Epoch 3/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:22<00:00,  4.12it/s, loss=0.1878]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  5.47it/s]
+Train - Loss: 0.2094, Acc: 0.9300, F1: 0.9300, Bal_Acc: 0.9300
+Val - Loss: 0.5240, Acc: 0.9297, F1: 0.9318, Bal_Acc: 0.9427
+Per-class Acc: (B: 0.9688, M: 0.9167)
+Tumor Acc: 0.6484, LR: 3.33e-04
+No improvement for 2/8 epochs
+
+Epoch 4/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:22<00:00,  4.13it/s, loss=0.1616]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  5.10it/s]
+Train - Loss: 0.2452, Acc: 0.9185, F1: 0.9185, Bal_Acc: 0.9185
+Val - Loss: 0.5604, Acc: 0.9297, F1: 0.9318, Bal_Acc: 0.9427
+Per-class Acc: (B: 0.9688, M: 0.9167)
+Tumor Acc: 0.6562, LR: 5.00e-04
+No improvement for 3/8 epochs
+
+Epoch 5/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:22<00:00,  4.14it/s, loss=0.1776]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  5.35it/s]
+Train - Loss: 0.2476, Acc: 0.9212, F1: 0.9212, Bal_Acc: 0.9212
+Val - Loss: 0.7274, Acc: 0.8594, F1: 0.8675, Bal_Acc: 0.9062
+Per-class Acc: (B: 1.0000, M: 0.8125)
+Tumor Acc: 0.6250, LR: 4.97e-04
+No improvement - Per-class requirement not met (min: 0.8125 < 0.85)
+
+Epoch 6/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:22<00:00,  4.11it/s, loss=0.2206]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  5.26it/s]
+Train - Loss: 0.2307, Acc: 0.9321, F1: 0.9321, Bal_Acc: 0.9321
+Val - Loss: 0.5705, Acc: 0.8672, F1: 0.8729, Bal_Acc: 0.8802
+Per-class Acc: (B: 0.9062, M: 0.8542)
+Tumor Acc: 0.7188, LR: 4.90e-04
+No improvement for 5/8 epochs
+
+Epoch 7/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:22<00:00,  4.14it/s, loss=0.1744]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  5.16it/s]
+Train - Loss: 0.1967, Acc: 0.9477, F1: 0.9477, Bal_Acc: 0.9477
+Val - Loss: 0.8610, Acc: 0.8281, F1: 0.8390, Bal_Acc: 0.8854
+Per-class Acc: (B: 1.0000, M: 0.7708)
+Tumor Acc: 0.5391, LR: 4.77e-04
+No improvement - Per-class requirement not met (min: 0.7708 < 0.85)
+
+Epoch 8/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:22<00:00,  4.11it/s, loss=0.1813]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  5.33it/s]
+Train - Loss: 0.1757, Acc: 0.9606, F1: 0.9606, Bal_Acc: 0.9606
+Val - Loss: 0.7369, Acc: 0.8359, F1: 0.8457, Bal_Acc: 0.8802
+Per-class Acc: (B: 0.9688, M: 0.7917)
+Tumor Acc: 0.5938, LR: 4.60e-04
+No improvement - Per-class requirement not met (min: 0.7917 < 0.85)
+
+Epoch 9/25
+--------------------------------------------------
+Training: 100%|--------| 92/92 [00:22<00:00,  4.15it/s, loss=0.2152]
+Validating: 100%|----------------| 8/8 [00:01<00:00,  5.22it/s]
+Train - Loss: 0.1880, Acc: 0.9552, F1: 0.9552, Bal_Acc: 0.9552
+Val - Loss: 0.5680, Acc: 0.9219, F1: 0.9245, Bal_Acc: 0.9375
+Per-class Acc: (B: 0.9688, M: 0.9062)
+Tumor Acc: 0.5391, LR: 4.39e-04
+No improvement for 8/8 epochs
+
+⏹️ Early stopping triggered after 9 epochs
+Best standard accuracy: 0.9844
+Best balanced accuracy: 0.9896
+
+📊 Loading best checkpoint for final evaluation...
+/workspace/BC-Attention-Fusion/main.py:181: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  checkpoint = torch.load(f'output/best_model_fold_{fold}.pth', map_location=device)
+🔍 Re-evaluating with best checkpoint...
+
+=== DETAILED CLASSIFICATION REPORT ===
+              precision    recall  f1-score   support
+
+      benign     0.9697    1.0000    0.9846        32
+   malignant     1.0000    0.9896    0.9948        96
+
+    accuracy                         0.9922       128
+   macro avg     0.9848    0.9948    0.9897       128
+weighted avg     0.9924    0.9922    0.9922       128
+
+
+=== CONFUSION MATRIX ===
+Predicted:  benign  malignant
+benign:         32        0
+malignant:       1       95
+
+=== KEY INSIGHTS ===
+Benign Recall: 1.0000 (32/32)
+Malignant Recall: 0.9896 (95/96)
+
+Prediction distribution: benign=33, malignant=95
+Analyzing cross-magnification feature importance...
+
+Final Validation Accuracy: 1.0000
+
+Magnification Importance Analysis:
+40x contribution: 0.0382 ± 0.0391
+100x contribution: 0.0270 ± 0.0513
+200x contribution: 0.0345 ± 0.0803
+400x contribution: 0.0324 ± 0.0450
 /workspace/BC-Attention-Fusion/plotting.py:178: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`). Consider using `matplotlib.pyplot.close()`.
   plt.figure(figsize=(10, 6))
 
 📊 Cross-Fold Summary Statistics:
  fold_no  multi_mag_patients_count  single_mag_patients_count  train_samples  test_samples
-       1                        82                          0           5005          2904
-       2                        82                          0           5506          2403
-       3                        82                          0           5332          2577
-       4                        82                          0           5211          2698
-       5                        82                          0           4826          3083
+       1                        82                          0          30885          8660
+       2                        82                          0          32420          7125
+       3                        82                          0          30735          8810
+       4                        82                          0          31600          7945
+       5                        82                          0          32540          7005
 
 === Per-Fold Results ===
 |        |   accuracy |   precision |   recall |     f1 |
 |--------|------------|-------------|----------|--------|
-| Fold 1 |     0.9420 |      0.9427 |   0.9737 | 0.9579 |
-| Fold 2 |     0.9241 |      0.9412 |   0.9474 | 0.9443 |
-| Fold 3 |     0.9330 |      0.9308 |   0.9737 | 0.9518 |
-| Fold 4 |     0.9018 |      0.9062 |   0.9539 | 0.9295 |
-| Fold 5 |     0.9420 |      0.9793 |   0.9342 | 0.9562 |
+| Fold 1 |     0.8897 |      0.9010 |   0.9479 | 0.9239 |
+| Fold 2 |     0.9926 |      0.9897 |   1.0000 | 0.9948 |
+| Fold 3 |     0.9922 |      0.9888 |   1.0000 | 0.9944 |
+| Fold 4 |     0.9922 |      0.9888 |   1.0000 | 0.9944 |
+| Fold 5 |     0.9922 |      1.0000 |   0.9896 | 0.9948 |
 
 ================================================================================
 🚀 RUNNING ENSEMBLE EVALUATION FOR MAXIMUM ACCURACY
 ================================================================================
+/workspace/BC-Attention-Fusion/main.py:248: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  checkpoint = torch.load(f'output/best_model_fold_{fold}.pth', map_location=device)
 🔥 Running Multi-Fold Ensemble Evaluation
 ============================================================
 
 📊 Evaluating Fold 1
-TTA Prediction: 100%|-----------| 14/14 [00:01<00:00, 10.72it/s]
+TTA Prediction: 100%|--------| 8/8 [00:01<00:00,  5.33it/s]
 
 📊 Evaluating Fold 2
-TTA Prediction: 100%|-----------| 14/14 [00:01<00:00, 10.62it/s]
+TTA Prediction: 100%|--------| 8/8 [00:01<00:00,  5.40it/s]
 
 📊 Evaluating Fold 3
-TTA Prediction: 100%|-----------| 14/14 [00:01<00:00, 10.66it/s]
+TTA Prediction: 100%|--------| 8/8 [00:01<00:00,  4.99it/s]
 
 📊 Evaluating Fold 4
-TTA Prediction: 100%|-----------| 14/14 [00:01<00:00, 10.48it/s]
+TTA Prediction: 100%|--------| 8/8 [00:01<00:00,  5.54it/s]
 
 📊 Evaluating Fold 5
-TTA Prediction: 100%|-----------| 14/14 [00:01<00:00, 10.65it/s]
+TTA Prediction: 100%|--------| 8/8 [00:01<00:00,  5.48it/s]
 
 🎯 Combining 5 fold predictions...
 Ensemble Results:
@@ -1137,18 +1100,18 @@ Ensemble Results:
 Classification Report:
               precision    recall  f1-score   support
 
-      Benign       1.00      1.00      1.00        72
-   Malignant       1.00      1.00      1.00       152
+      Benign       1.00      1.00      1.00        32
+   Malignant       1.00      1.00      1.00        96
 
-    accuracy                           1.00       224
-   macro avg       1.00      1.00      1.00       224
-weighted avg       1.00      1.00      1.00       224
+    accuracy                           1.00       128
+   macro avg       1.00      1.00      1.00       128
+weighted avg       1.00      1.00      1.00       128
 
 
 🎯 Confidence-based results:
 
 --- Confidence >= 0.7 ---
-Confidence threshold 0.7: 207/224 samples retained
+Confidence threshold 0.7: 119/128 samples retained
 Ensemble Results:
   Accuracy: 1.0000
   Balanced Accuracy: 1.0000
@@ -1157,16 +1120,16 @@ Ensemble Results:
 Classification Report:
               precision    recall  f1-score   support
 
-      Benign       1.00      1.00      1.00        62
-   Malignant       1.00      1.00      1.00       145
+      Benign       1.00      1.00      1.00        32
+   Malignant       1.00      1.00      1.00        87
 
-    accuracy                           1.00       207
-   macro avg       1.00      1.00      1.00       207
-weighted avg       1.00      1.00      1.00       207
+    accuracy                           1.00       119
+   macro avg       1.00      1.00      1.00       119
+weighted avg       1.00      1.00      1.00       119
 
 
 --- Confidence >= 0.8 ---
-Confidence threshold 0.8: 189/224 samples retained
+Confidence threshold 0.8: 112/128 samples retained
 Ensemble Results:
   Accuracy: 1.0000
   Balanced Accuracy: 1.0000
@@ -1175,16 +1138,16 @@ Ensemble Results:
 Classification Report:
               precision    recall  f1-score   support
 
-      Benign       1.00      1.00      1.00        55
-   Malignant       1.00      1.00      1.00       134
+      Benign       1.00      1.00      1.00        32
+   Malignant       1.00      1.00      1.00        80
 
-    accuracy                           1.00       189
-   macro avg       1.00      1.00      1.00       189
-weighted avg       1.00      1.00      1.00       189
+    accuracy                           1.00       112
+   macro avg       1.00      1.00      1.00       112
+weighted avg       1.00      1.00      1.00       112
 
 
 --- Confidence >= 0.9 ---
-Confidence threshold 0.9: 104/224 samples retained
+Confidence threshold 0.9: 78/128 samples retained
 Ensemble Results:
   Accuracy: 1.0000
   Balanced Accuracy: 1.0000
@@ -1193,16 +1156,16 @@ Ensemble Results:
 Classification Report:
               precision    recall  f1-score   support
 
-      Benign       1.00      1.00      1.00        36
-   Malignant       1.00      1.00      1.00        68
+      Benign       1.00      1.00      1.00        31
+   Malignant       1.00      1.00      1.00        47
 
-    accuracy                           1.00       104
-   macro avg       1.00      1.00      1.00       104
-weighted avg       1.00      1.00      1.00       104
+    accuracy                           1.00        78
+   macro avg       1.00      1.00      1.00        78
+weighted avg       1.00      1.00      1.00        78
 
 
 --- Confidence >= 0.95 ---
-Confidence threshold 0.95: 49/224 samples retained
+Confidence threshold 0.95: 29/128 samples retained
 Ensemble Results:
   Accuracy: 1.0000
   Balanced Accuracy: 1.0000
@@ -1211,12 +1174,12 @@ Ensemble Results:
 Classification Report:
               precision    recall  f1-score   support
 
-      Benign       1.00      1.00      1.00        20
-   Malignant       1.00      1.00      1.00        29
+      Benign       1.00      1.00      1.00        19
+   Malignant       1.00      1.00      1.00        10
 
-    accuracy                           1.00        49
-   macro avg       1.00      1.00      1.00        49
-weighted avg       1.00      1.00      1.00        49
+    accuracy                           1.00        29
+   macro avg       1.00      1.00      1.00        29
+weighted avg       1.00      1.00      1.00        29
 
 
 🎯 FINAL ENSEMBLE ACCURACY: 1.0000
