@@ -11,6 +11,7 @@ from datasets.multi_mag import MultiMagnificationDataset
 from plotting import plot_all_fold_confusion_matrices, plot_cross_magnification_fusion, plot_training_metrics, print_cross_fold_summary, print_fold_metrics
 from train import train_model
 from datasets.preprocess import create_multi_mag_dataset_info
+from config import get_training_config, TRAINING_CONFIG
 
 from utils.transforms import get_transforms
 
@@ -42,13 +43,16 @@ g = torch.Generator()
 g.manual_seed(42)
 
 def get_device():
-    device = torch.device("cpu")
-    num_gpus = 0
-
-    if torch.cuda.is_available():
-        device = torch.device("cuda")
-        num_gpus = torch.cuda.device_count()
-        print(f"CUDA available with {num_gpus} GPU(s)")
+    """Get device info with tensor core optimization"""
+    config = get_training_config()
+    device = config['device']
+    num_gpus = config['num_gpus']
+    
+    print(f"🔧 Environment detected: {config['environment']}")
+    print(f"🎯 Device: {device}")
+    
+    if device.type == "cuda":
+        print(f"🚀 CUDA available with {num_gpus} GPU(s)")
         
         # Enable tensor core optimization for supported GPUs
         if num_gpus > 0:
@@ -56,16 +60,19 @@ def get_device():
             if "A100" in gpu_name or "V100" in gpu_name or "RTX" in gpu_name or "T4" in gpu_name:
                 torch.backends.cudnn.allow_tf32 = True
                 torch.backends.cuda.matmul.allow_tf32 = True
-                print(f"Tensor core optimization enabled for {gpu_name}")
+                print(f"⚡ Tensor core optimization enabled for {gpu_name}")
+                
+        if num_gpus > 1:
+            print(f"🔥 Multi-GPU training will be enabled with {num_gpus} GPUs")
             
-    elif torch.backends.mps.is_available():
-        device = torch.device("mps")
-        print("Using Apple Metal Performance Shaders (MPS)")
-
-    print(f"Using device: {device}")
-    if num_gpus > 1:
-        print(f"Multi-GPU training will be enabled with {num_gpus} GPUs")
-    return device, num_gpus
+    elif device.type == "mps":
+        print("🍎 Using Apple Metal Performance Shaders (MPS)")
+    else:
+        print("💻 Using CPU (consider using GPU for faster training)")
+        
+    print(f"📊 Batch size: {config['batch_size']} | Workers: {config['num_workers']}")
+    
+    return device, num_gpus, config
 
 
 def main():
@@ -74,11 +81,11 @@ def main():
 
     from datasets.examine import folds_df
 
-    device, num_gpus = get_device()
+    device, num_gpus, train_config = get_device()
 
     # Create datasets
-    train_transform = get_transforms('train', img_size=224)
-    val_transform = get_transforms('val', img_size=224)
+    train_transform = get_transforms('train', img_size=TRAINING_CONFIG['img_size'])
+    val_transform = get_transforms('val', img_size=TRAINING_CONFIG['img_size'])
 
 
     models = get_all_backbones()
@@ -113,8 +120,8 @@ def main():
             multi_mag_patients, 
             fold_df,
             mode='train',
-            mags=[40, 100, 200, 400],
-            samples_per_patient=16,  # Increased for better coverage and harder examples
+            mags=TRAINING_CONFIG['magnifications'],
+            samples_per_patient=TRAINING_CONFIG['samples_per_patient_train'],
             transform=train_transform,
             balance_classes=True  # Enable balancing
         )
@@ -123,24 +130,39 @@ def main():
             multi_mag_patients,
             fold_df,
             mode='test',
-            mags=[40, 100, 200, 400],
-            samples_per_patient=4,  # Increased for more robust validation
+            mags=TRAINING_CONFIG['magnifications'],
+            samples_per_patient=TRAINING_CONFIG['samples_per_patient_val'],
             transform=val_transform
         )
 
-        # Scale batch size with number of GPUs
-        base_batch_size = 8
-        effective_batch_size = base_batch_size * max(1, num_gpus)
+        # Use device-specific configuration
+        effective_batch_size = train_config['effective_batch_size']
+        num_workers = train_config['num_workers']
+        pin_memory = train_config['pin_memory']
+        persistent_workers = train_config['persistent_workers']
         
-        # Reduce num_workers to avoid multiprocessing issues
-        num_workers = 2 if num_gpus > 1 else 0  # Use fewer workers for multi-GPU to avoid crashes
+        train_loader = DataLoader(
+            train_dataset, 
+            batch_size=effective_batch_size, 
+            shuffle=True, 
+            num_workers=num_workers,
+            worker_init_fn=seed_worker if num_workers > 0 else None, 
+            generator=g if num_workers > 0 else None, 
+            pin_memory=pin_memory, 
+            persistent_workers=persistent_workers and num_workers > 0
+        )
+        val_loader = DataLoader(
+            val_dataset, 
+            batch_size=effective_batch_size, 
+            shuffle=False, 
+            num_workers=num_workers,
+            worker_init_fn=seed_worker if num_workers > 0 else None, 
+            generator=g if num_workers > 0 else None, 
+            pin_memory=pin_memory, 
+            persistent_workers=persistent_workers and num_workers > 0
+        )
         
-        train_loader = DataLoader(train_dataset, batch_size=effective_batch_size, shuffle=True, num_workers=num_workers,
-                                worker_init_fn=seed_worker, generator=g, pin_memory=True, persistent_workers=num_workers > 0)
-        val_loader = DataLoader(val_dataset, batch_size=effective_batch_size, shuffle=False, num_workers=num_workers,
-                                worker_init_fn=seed_worker, generator=g, pin_memory=True, persistent_workers=num_workers > 0)
-        
-        print(f"Using batch size: {effective_batch_size} (base: {base_batch_size} x {max(1, num_gpus)} GPUs)")
+        print(f"📈 Using batch size: {effective_batch_size} | Workers: {num_workers} | Environment: {train_config['environment']}")
 
         print("Starting training...")
         history, val_preds, val_labels = train_model(
@@ -149,7 +171,7 @@ def main():
             val_loader,
             fold_df,
             fold=fold,
-            num_epochs=25,  # Extended training for better convergence
+            num_epochs=TRAINING_CONFIG['num_epochs'],
             device=device
         )
 
@@ -170,7 +192,7 @@ def main():
         all_cms.append(cm)
 
         # Load best model - handle DataParallel wrapper
-        checkpoint = torch.load(f'output/best_model_fold_{fold}.pth', map_location=device)
+        checkpoint = torch.load(f'output/best_model_fold_{fold}.pth', map_location=device, weights_only=True)
         if hasattr(model, 'module'):
             # Model is wrapped with DataParallel
             model.module.load_state_dict(checkpoint)
@@ -201,7 +223,7 @@ def main():
         fold_model = models['our_model']
         
         # Load the best checkpoint for this fold
-        checkpoint = torch.load(f'output/best_model_fold_{fold}.pth', map_location=device)
+        checkpoint = torch.load(f'output/best_model_fold_{fold}.pth', map_location=device, weights_only=True)
         if hasattr(fold_model, 'module'):
             fold_model.module.load_state_dict(checkpoint)
         else:

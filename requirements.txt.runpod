@@ -1,44 +1,36 @@
-# RunPod-compatible requirements with flexible versioning
+# RunPod requirements optimized for runpod/pytorch:2.1.0-py3.10-cuda11.8.0-devel-ubuntu22.04
 # Use with: pip install -r requirements.txt.runpod
 
-# Core ML libraries - flexible versions for RunPod compatibility
-torch>=2.0.0
-torchvision>=0.15.0
+# SKIP torch, torchvision - already in base container (PyTorch 2.1.0 + CUDA 11.8)
+# SKIP numpy, pillow - already in base container
+
+# Core ML libraries that need installation
 timm>=0.9.0
 
-# Scientific computing - numpy version compatible with PyTorch
-numpy>=1.21.0,<2.0.0
+# Scientific computing (not in base container)
 scipy>=1.7.0
 scikit-learn>=1.0.0
-pandas
+pandas>=1.3.0
 
 # Computer vision
 opencv-python>=4.5.0
-pillow>=8.0.0
 
-# Visualization
+# Visualization (matplotlib might be in base, but seaborn usually isn't)
 matplotlib>=3.3.0
 seaborn>=0.11.0
 
 # Medical imaging specific
 staintools>=2.0.0
 
-# Utilities
+# Utilities (some might be in base container)
 tqdm>=4.60.0
 PyYAML>=5.4.0
-requests>=2.25.0
 
-# HuggingFace ecosystem
+# HuggingFace ecosystem (usually not in base PyTorch containers)
 huggingface-hub>=0.10.0
 safetensors>=0.3.0
 
-# Optional performance boost (may not be available on all RunPod instances)
-# spams-bin>=2.6.0  # Uncomment if available and needed
-
-# Common utilities that should be available
-setuptools
-packaging
+# Additional utilities likely missing from base container
+tabulate
 filelock
 fsspec
-
-tabulate

@@ -17,22 +17,17 @@ echo "🔍 Checking GPU and CUDA..."
 nvidia-smi
 echo ""
 
-# Check current PyTorch installation
-echo "🔍 Checking current PyTorch installation..."
-python -c "import torch; print('Current PyTorch version:', torch.__version__); print('CUDA available:', torch.cuda.is_available()); print('CUDA version:', torch.version.cuda if torch.cuda.is_available() else 'None')" || echo "PyTorch not installed or has issues"
+# Check current PyTorch installation (should be 2.1.0 with CUDA 11.8)
+echo "🔍 Checking base container PyTorch..."
+python -c "import torch; print('Base PyTorch version:', torch.__version__); print('CUDA available:', torch.cuda.is_available()); print('CUDA version:', torch.version.cuda if torch.cuda.is_available() else 'None')" || echo "PyTorch has issues"
 echo ""
 
-# Uninstall existing PyTorch installations
-echo "🗑️  Removing existing PyTorch installations..."
-pip uninstall torch torchvision torchaudio -y
+# Skip PyTorch reinstallation - use base container version (2.1.0 + CUDA 11.8)
+echo "⚡ Using base container PyTorch 2.1.0 with CUDA 11.8..."
+echo "   (Skipping PyTorch reinstallation to save time)"
 
-# Install PyTorch with CUDA 12.1 support (compatible with CUDA 12.4)
-echo "⚡ Installing PyTorch with CUDA support..."
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-
-# Install other dependencies with numpy compatibility fix
-echo "📚 Installing project dependencies..."
-pip install numpy==1.24.4  # Force compatible numpy version
+# Install only missing dependencies
+echo "📚 Installing additional project dependencies..."
 pip install -r requirements.txt.runpod
 
 # Verify CUDA installation

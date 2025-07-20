@@ -158,8 +158,8 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
             # Statistics - accumulate on GPU to reduce transfers
             running_loss += loss.item()
             preds = torch.argmax(class_logits, dim=1)
-            all_preds.append(preds)
-            all_labels.append(class_labels)
+            all_preds.append(preds.detach())  # Detach to avoid keeping computation graph
+            all_labels.append(class_labels.detach())
             
             # Update progress bar
             progress_bar.set_postfix({'loss': f'{loss.item():.4f}'})
@@ -200,10 +200,10 @@ def train_model(model, train_loader, val_loader, fold_df, fold, num_epochs, devi
                 preds = torch.argmax(class_logits, dim=1)
                 tumor_preds = torch.argmax(tumor_logits, dim=1)
                 
-                all_preds.append(preds)
-                all_labels.append(class_labels)
-                all_tumor_preds.append(tumor_preds)
-                all_tumor_labels.append(tumor_labels)
+                all_preds.append(preds.detach())
+                all_labels.append(class_labels.detach())
+                all_tumor_preds.append(tumor_preds.detach())
+                all_tumor_labels.append(tumor_labels.detach())
         
         # Convert accumulated tensors to numpy once at the end
         all_preds_np = torch.cat(all_preds).cpu().numpy()
