@@ -172,7 +172,8 @@ def main():
             mags=TRAINING_CONFIG['magnifications'],
             samples_per_patient=TRAINING_CONFIG['samples_per_patient_train'],
             transform=train_transform,
-            balance_classes=True  # Enable balancing
+            balance_classes=True,  # Enable balancing
+            require_all_mags=True  # Only include patients with all magnifications
         )
 
         # Validate on test samples from main fold  
@@ -184,7 +185,8 @@ def main():
             mags=TRAINING_CONFIG['magnifications'],
             samples_per_patient=TRAINING_CONFIG['samples_per_patient_val'],
             transform=val_transform,
-            balance_classes=True  # Add class balancing to validation for fair evaluation
+            balance_classes=True,  # Add class balancing to validation for fair evaluation
+            require_all_mags=True  # Only include patients with all magnifications
         )
 
         # Use device-specific configuration
@@ -290,7 +292,8 @@ def main():
             mags=TRAINING_CONFIG['magnifications'],
             samples_per_patient=TRAINING_CONFIG['samples_per_patient_val'],
             transform=val_transform,
-            balance_classes=False  # No balancing for final test
+            balance_classes=False,  # No balancing for final test
+            require_all_mags=True  # Only include patients with all magnifications
         )
         
         test_loader = DataLoader(

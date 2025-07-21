@@ -9,13 +9,15 @@ from config import BASE_PATH
 
 class MultiMagnificationDataset(Dataset):    
     def __init__(self, patient_data, fold_df, mode='train', mags=[40, 100, 200, 400], 
-                 samples_per_patient=4, transform=None, balance_classes=True):
+                 samples_per_patient=4, transform=None, balance_classes=True, 
+                 require_all_mags=True):
         self.patient_data = patient_data
         self.fold_df = fold_df
         self.mode = mode
         self.mags = mags
         self.samples_per_patient = samples_per_patient
         self.transform = transform
+        self.require_all_mags = require_all_mags
         self.base_path = BASE_PATH + '/BreaKHis_v1'
         self.rng = np.random.default_rng(seed=42)
 
@@ -31,14 +33,40 @@ class MultiMagnificationDataset(Dataset):
             ]
 
             if len(patient_fold_data) > 0:
-                # Create sample entries
-                for _ in range(self.samples_per_patient):
-                    self.samples.append({
-                        'patient_id': patient_id,
-                        'tumor_class': patient['tumor_class'],
-                        'tumor_type': patient['tumor_type'],
-                        'images': patient['images']
-                    })
+                # Filter images to only include those in current mode/fold
+                mode_images = {}
+                for mag in self.mags:
+                    # Compare with both int and string versions to handle type variations
+                    mag_files = patient_fold_data[
+                        (patient_fold_data['magnification'] == mag) | 
+                        (patient_fold_data['magnification'] == str(mag))
+                    ]['filename'].tolist()
+                    if mag_files:
+                        mode_images[mag] = mag_files
+                
+                # Check if patient meets magnification requirements
+                if self.require_all_mags:
+                    # Only include if patient has ALL required magnifications
+                    if set(mode_images.keys()) == set(self.mags):
+                        # Create sample entries
+                        for _ in range(self.samples_per_patient):
+                            self.samples.append({
+                                'patient_id': patient_id,
+                                'tumor_class': patient['tumor_class'],
+                                'tumor_type': patient['tumor_type'],
+                                'images': mode_images
+                            })
+                else:
+                    # Include if patient has at least some magnifications
+                    if mode_images:
+                        # Create sample entries
+                        for _ in range(self.samples_per_patient):
+                            self.samples.append({
+                                'patient_id': patient_id,
+                                'tumor_class': patient['tumor_class'],
+                                'tumor_type': patient['tumor_type'],
+                                'images': mode_images
+                            })
 
         if balance_classes and mode == 'train':
             self._create_balanced_samples()
@@ -60,6 +88,17 @@ class MultiMagnificationDataset(Dataset):
         """Balance samples by oversampling minority class"""
         benign_samples = [s for s in self.samples if s['tumor_class'] == 'benign']
         malignant_samples = [s for s in self.samples if s['tumor_class'] == 'malignant']
+        
+        # Handle case where one class is missing
+        if len(benign_samples) == 0:
+            print(f"No benign samples found in {self.mode} mode - using only malignant samples")
+            self.samples = malignant_samples
+            return
+        
+        if len(malignant_samples) == 0:
+            print(f"No malignant samples found in {self.mode} mode - using only benign samples")
+            self.samples = benign_samples
+            return
         
         # Calculate how many times to repeat benign samples
         repeat_factor = len(malignant_samples) // len(benign_samples)
@@ -88,10 +127,13 @@ class MultiMagnificationDataset(Dataset):
         # Dictionary to store images from different magnifications
         images = {}
 
-        # For each magnification, randomly select one image
+        # For each magnification, deterministically select image to prevent data leakage
         for mag in self.mags:
             if mag in sample['images'] and sample['images'][mag]:
-                img_path = self.rng.choice(sample['images'][mag])
+                # Sort images for deterministic selection, then use modulo for consistent selection
+                sorted_images = sorted(sample['images'][mag])
+                img_idx = (idx + hash(sample['patient_id'])) % len(sorted_images)
+                img_path = sorted_images[img_idx]
                 full_path = os.path.join(self.base_path, img_path)
 
                 try:
@@ -105,8 +147,34 @@ class MultiMagnificationDataset(Dataset):
 
                 images[f'mag_{mag}'] = image
             else:
-                print(f"Missing magnification {mag} for patient {sample['patient_id']}")
-                images[f'mag_{mag}'] = torch.zeros((3, 224, 224))  # dummy tensor
+                if not self.require_all_mags:
+                    # Use fallback strategy: try to use closest available magnification
+                    available_mags = list(sample['images'].keys())
+                    if available_mags:
+                        # Find closest magnification
+                        closest_mag = min(available_mags, key=lambda x: abs(x - mag))
+                        print(f"Missing magnification {mag} for patient {sample['patient_id']}, using {closest_mag}x as fallback")
+                        # Use deterministic selection for fallback too
+                        sorted_images = sorted(sample['images'][closest_mag])
+                        img_idx = (idx + hash(sample['patient_id'])) % len(sorted_images)
+                        img_path = sorted_images[img_idx]
+                        full_path = os.path.join(self.base_path, img_path)
+                        
+                        try:
+                            image = Image.open(full_path).convert('RGB')
+                            if self.transform:
+                                image = self.transform(image)
+                            images[f'mag_{mag}'] = image
+                        except Exception as e:
+                            print(f"Error loading fallback image: {full_path} ({e})")
+                            images[f'mag_{mag}'] = torch.zeros((3, 224, 224))
+                    else:
+                        print(f"No images available for patient {sample['patient_id']}")
+                        images[f'mag_{mag}'] = torch.zeros((3, 224, 224))
+                else:
+                    # This shouldn't happen if require_all_mags=True and filtering worked correctly
+                    print(f"ERROR: Missing magnification {mag} for patient {sample['patient_id']} (require_all_mags=True)")
+                    images[f'mag_{mag}'] = torch.zeros((3, 224, 224))
 
         class_label = self.class_to_idx[sample['tumor_class']]
         tumor_type_label = self.tumor_type_to_idx[sample['tumor_type']]
