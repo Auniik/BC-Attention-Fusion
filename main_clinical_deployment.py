@@ -309,6 +309,8 @@ def train_clinical_model(model, train_loader, val_loader, device, config, fold_n
             
             # Training metrics
             for key, value in loss_components.items():
+                if key not in train_metrics:
+                    train_metrics[key] = 0.0
                 train_metrics[key] += value
             
             class_preds = torch.argmax(class_logits, dim=1)
