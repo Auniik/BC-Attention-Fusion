@@ -102,7 +102,9 @@ class HierarchicalMagnificationAttention(nn.Module):
         # Add magnification embeddings
         enhanced_features = {}
         for i, mag in enumerate(self.mag_hierarchy):
-            enhanced_features[mag] = mag_features[mag] + self.mag_embeddings[i]
+            # Handle both string keys ('40') and integer keys (40)
+            mag_key = mag if mag in mag_features else int(mag)
+            enhanced_features[mag] = mag_features[mag_key] + self.mag_embeddings[i]
         
         hierarchical_features = {'40': enhanced_features['40']}  # 40x is the root
         attention_maps = {}
@@ -175,7 +177,9 @@ class CrossMagnificationFusion(nn.Module):
         # Stack all magnification features: [B, num_mags, feat_dim]
         mag_order = ['40', '100', '200', '400']
         stacked_features = torch.stack([
-            hierarchical_features[mag] for mag in mag_order
+            hierarchical_features[mag] if mag in hierarchical_features 
+            else hierarchical_features[int(mag)] 
+            for mag in mag_order
         ], dim=1)
         
         # Apply magnification importance weights

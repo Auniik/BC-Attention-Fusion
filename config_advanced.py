@@ -94,7 +94,7 @@ ADVANCED_TRAINING_CONFIG = {
     # Data parameters
     'samples_per_patient': 12,  # Fewer samples due to memory constraints
     'samples_per_patient_val': 8,  # Reduced validation samples
-    'magnifications': [40, 100, 200, 400],
+    'magnifications': ['40', '100', '200', '400'],
     'img_size': 224,
     'seed': 42,
     
