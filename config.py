@@ -7,6 +7,7 @@ BASE_PATH = get_base_path() + '/breakhis'
 
 
 FOLD_PATH = os.path.join(BASE_PATH, 'Folds_fixed.csv')  # Fixed cross-validation without data leakage
+HOLDOUT_PATH = os.path.join(BASE_PATH, 'Folds_holdout.csv')  # True holdout split for clinical evaluation
 SLIDES_PATH = os.path.join(BASE_PATH, 'BreaKHis_v1/BreaKHis_v1/histology_slides/breast')
 
 
@@ -79,16 +80,20 @@ def get_training_config():
 
 # Training hyperparameters
 TRAINING_CONFIG = {
-    'num_epochs': 25,
+    'epochs': 25,  # Main training config uses 'epochs' 
+    'num_epochs': 25,  # Keep for backward compatibility
     'learning_rate': 5e-4,
     'weight_decay': 1e-3,
     'warmup_epochs': 3,
     'patience': 8,
-    'samples_per_patient_train': 16,
+    'samples_per_patient': 16,  # Main training config uses this name
+    'samples_per_patient_train': 16,  # Keep for backward compatibility
     'samples_per_patient_val': 12,  # Increased validation data per patient
     'magnifications': [40, 100, 200, 400],
     'img_size': 224,
-    'seed': 42
+    'seed': 42,
+    'model_name': 'LightweightMultiMagNet',  # Default model for holdout training
+    'batch_size': 8  # Will be overridden by device-specific config
 }
 
 # Loss function weights
